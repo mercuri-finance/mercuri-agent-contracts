@@ -8,12 +8,12 @@ import {LaunchFactory} from "@mercuri/launch/LaunchFactory.sol";
 import {GraduationManager} from "@mercuri/launch/GraduationManager.sol";
 import {PoolKey} from "@uniswap/v4-core/src/types/PoolKey.sol";
 import {IAllowanceTransfer} from "permit2/src/interfaces/IAllowanceTransfer.sol";
-import {DeployAgentAccounts} from "../script/DeployAgentAccounts.s.sol";
-import {AgentAccount} from "../src/AgentAccount.sol";
-import {AgentAccountFactory} from "../src/AgentAccountFactory.sol";
-import {AgentPolicyRegistry} from "../src/AgentPolicyRegistry.sol";
-import {InitParams, P_ALL} from "../src/libraries/AgentTypes.sol";
-import {NativeUsdcShim} from "./utils/NativeUsdcShim.sol";
+import {DeployAgentAccounts} from "../../script/DeployAgentAccounts.s.sol";
+import {AgentAccount} from "../../src/AgentAccount.sol";
+import {AgentAccountFactory} from "../../src/AgentAccountFactory.sol";
+import {AgentPolicyRegistry} from "../../src/AgentPolicyRegistry.sol";
+import {InitParams, P_ALL} from "../../src/libraries/AgentTypes.sol";
+import {NativeUsdcShim} from "../utils/NativeUsdcShim.sol";
 
 /// @dev Spec section 10 pinned fork: an agent account deployed by the real deploy script against Arc testnet's
 ///      deployed Launch contracts swaps on a graduated pool through the deployed Universal Router and LaunchHook.

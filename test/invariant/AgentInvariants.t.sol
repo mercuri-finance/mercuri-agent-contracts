@@ -8,11 +8,11 @@ import {BondingCurve} from "@mercuri/launch/BondingCurve.sol";
 import {PoolKey} from "@uniswap/v4-core/src/types/PoolKey.sol";
 import {Currency} from "@uniswap/v4-core/src/types/Currency.sol";
 import {IV4Quoter} from "@uniswap/v4-periphery/src/interfaces/IV4Quoter.sol";
-import {AgentFixture} from "./AgentFixture.sol";
-import {AgentAccount} from "../src/AgentAccount.sol";
-import {AgentPolicyLib} from "../src/libraries/AgentPolicyLib.sol";
-import {IAgentAccount} from "../src/interfaces/IAgentAccount.sol";
-import {IAgentPolicyRegistry} from "../src/interfaces/IAgentPolicyRegistry.sol";
+import {AgentFixture} from "../utils/AgentFixture.sol";
+import {AgentAccount} from "../../src/AgentAccount.sol";
+import {AgentPolicyLib} from "../../src/libraries/AgentPolicyLib.sol";
+import {IAgentAccount} from "../../src/interfaces/IAgentAccount.sol";
+import {IAgentPolicyRegistry} from "../../src/interfaces/IAgentPolicyRegistry.sol";
 import {
     Policy,
     Agent,
@@ -26,7 +26,7 @@ import {
     P_CLAIM,
     P_SWEEP_TO_OWNER,
     QUEUE_TTL
-} from "../src/libraries/AgentTypes.sol";
+} from "../../src/libraries/AgentTypes.sol";
 
 /// @dev The only fuzz target: every call is one `step` of the suite, which holds the fixture and the cheatcodes.
 contract AgentInvariantHandler {

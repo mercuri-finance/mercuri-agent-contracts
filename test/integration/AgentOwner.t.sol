@@ -2,12 +2,12 @@
 pragma solidity ^0.8.26;
 
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
-import {AgentFixture} from "./AgentFixture.sol";
-import {AgentAccount} from "../src/AgentAccount.sol";
-import {IAgentAccount} from "../src/interfaces/IAgentAccount.sol";
-import {IAgentPolicyRegistry} from "../src/interfaces/IAgentPolicyRegistry.sol";
-import {AgentPolicyLib} from "../src/libraries/AgentPolicyLib.sol";
-import {IAgentAccountFactory} from "../src/interfaces/IAgentAccountFactory.sol";
+import {AgentFixture} from "../utils/AgentFixture.sol";
+import {AgentAccount} from "../../src/AgentAccount.sol";
+import {IAgentAccount} from "../../src/interfaces/IAgentAccount.sol";
+import {IAgentPolicyRegistry} from "../../src/interfaces/IAgentPolicyRegistry.sol";
+import {AgentPolicyLib} from "../../src/libraries/AgentPolicyLib.sol";
+import {IAgentAccountFactory} from "../../src/interfaces/IAgentAccountFactory.sol";
 import {
     Policy,
     Agent,
@@ -24,7 +24,7 @@ import {
     Q_ALLOW_TOKEN,
     Q_DELAY,
     Q_OWNER
-} from "../src/libraries/AgentTypes.sol";
+} from "../../src/libraries/AgentTypes.sol";
 
 /// @dev Exposes the internal library helpers for direct checks.
 contract PolicyLibHarness {

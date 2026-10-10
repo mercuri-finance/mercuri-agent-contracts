@@ -84,6 +84,6 @@ if [[ ${1:-} == "--stress" ]]; then
   FOUNDRY_INVARIANT_RUNS=1024 FOUNDRY_INVARIANT_DEPTH=256 \
     FOUNDRY_INVARIANT_FAIL_ON_REVERT=true \
     FOUNDRY_INVARIANT_FAILURE_PERSIST_DIR="$agent_campaign_dir" \
-    forge test --match-path 'test/AgentInvariants.t.sol' --match-contract 'AgentInvariantsTest' \
+    forge test --match-path 'test/invariant/AgentInvariants.t.sol' --match-contract 'AgentInvariantsTest' \
     --fuzz-seed 0x5042002
 fi

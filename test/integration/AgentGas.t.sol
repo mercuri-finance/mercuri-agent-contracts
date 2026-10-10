@@ -3,8 +3,8 @@ pragma solidity ^0.8.26;
 
 import {LaunchToken} from "@mercuri/launch/LaunchToken.sol";
 import {BondingCurve} from "@mercuri/launch/BondingCurve.sol";
-import {AgentFixture} from "./AgentFixture.sol";
-import {AgentAccount} from "../src/AgentAccount.sol";
+import {AgentFixture} from "../utils/AgentFixture.sol";
+import {AgentAccount} from "../../src/AgentAccount.sol";
 
 /// @dev Gas of an agent's curve buy and sell against a direct EOA trade of the same size, logged for the report.
 contract AgentGasTest is AgentFixture {

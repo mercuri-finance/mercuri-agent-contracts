@@ -9,12 +9,12 @@ import {LaunchToken} from "@mercuri/launch/LaunchToken.sol";
 import {BondingCurve} from "@mercuri/launch/BondingCurve.sol";
 import {CreateParams} from "@mercuri/launch/libraries/LaunchTypes.sol";
 import {IV4Router} from "@uniswap/v4-periphery/src/interfaces/IV4Router.sol";
-import {AgentFixture} from "./AgentFixture.sol";
-import {AgentAccount} from "../src/AgentAccount.sol";
-import {IAgentAccount} from "../src/interfaces/IAgentAccount.sol";
-import {IAgentPolicyRegistry} from "../src/interfaces/IAgentPolicyRegistry.sol";
-import {AgentPolicyLib} from "../src/libraries/AgentPolicyLib.sol";
-import {Policy, InitParams, P_ALL, P_BUY, QUEUE_TTL} from "../src/libraries/AgentTypes.sol";
+import {AgentFixture} from "../utils/AgentFixture.sol";
+import {AgentAccount} from "../../src/AgentAccount.sol";
+import {IAgentAccount} from "../../src/interfaces/IAgentAccount.sol";
+import {IAgentPolicyRegistry} from "../../src/interfaces/IAgentPolicyRegistry.sol";
+import {AgentPolicyLib} from "../../src/libraries/AgentPolicyLib.sol";
+import {Policy, InitParams, P_ALL, P_BUY, QUEUE_TTL} from "../../src/libraries/AgentTypes.sol";
 
 /// @dev A token a stranger sends to an account. Every transfer out of the account tries to re-enter it.
 contract ReentrantToken is ERC20 {

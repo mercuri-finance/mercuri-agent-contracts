@@ -7,10 +7,10 @@ import {LaunchToken} from "@mercuri/launch/LaunchToken.sol";
 import {BondingCurve} from "@mercuri/launch/BondingCurve.sol";
 import {IFeeManager} from "@mercuri/launch/interfaces/IFeeManager.sol";
 import {CreateParams} from "@mercuri/launch/libraries/LaunchTypes.sol";
-import {AgentFixture} from "./AgentFixture.sol";
-import {AgentAccount} from "../src/AgentAccount.sol";
-import {IAgentAccount} from "../src/interfaces/IAgentAccount.sol";
-import {IAgentPolicyRegistry} from "../src/interfaces/IAgentPolicyRegistry.sol";
+import {AgentFixture} from "../utils/AgentFixture.sol";
+import {AgentAccount} from "../../src/AgentAccount.sol";
+import {IAgentAccount} from "../../src/interfaces/IAgentAccount.sol";
+import {IAgentPolicyRegistry} from "../../src/interfaces/IAgentPolicyRegistry.sol";
 import {
     Policy,
     InitParams,
@@ -22,7 +22,7 @@ import {
     ACTION_LAUNCH,
     ACTION_CLAIM,
     ACTION_SWEEP
-} from "../src/libraries/AgentTypes.sol";
+} from "../../src/libraries/AgentTypes.sol";
 
 /// @dev Task 4: agent launches, creator-fee claims and sweeps to the owner (spec section 4.6).
 contract AgentLaunchTest is AgentFixture {

@@ -133,7 +133,7 @@ contract DeployAgentLocal is Script {
     }
 
     /// @dev The implementation is bound to the factory deployed right after it and to the registry that factory
-    ///      deploys as its first CREATE (contract nonces start at 1), exactly as test/agents/AgentFixture.sol does.
+    ///      deploys as its first CREATE (contract nonces start at 1), exactly as test/utils/AgentFixture.sol does.
     function _deployAgents(Deployed memory d, address deployer) internal {
         address predictedFactory = vm.computeCreateAddress(deployer, vm.getNonce(deployer) + 1);
         address predictedRegistry = vm.computeCreateAddress(predictedFactory, 1);
