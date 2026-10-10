@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="deployments/manifest-5042002.json"><img src="https://img.shields.io/badge/Arc_testnet-target_chain_5042002-43459D?style=flat-square" alt="Arc testnet target, chain 5042002"></a>
-  <a href="#deployment"><img src="https://img.shields.io/badge/release-not_deployed-1B3158?style=flat-square" alt="release not deployed"></a>
+  <a href="deployments/5042002.json"><img src="https://img.shields.io/badge/release-1.0.0--beta.1_testnet-1B3158?style=flat-square" alt="release 1.0.0-beta.1 on testnet"></a>
   <a href="#build-and-verify"><img src="https://img.shields.io/badge/build-pinned-1B3158?style=flat-square" alt="build pinned"></a>
   <a href="foundry.toml"><img src="https://img.shields.io/badge/solidity-0.8.26-1B3158?style=flat-square" alt="Solidity 0.8.26"></a>
   <a href="src/AgentAccount.sol"><img src="https://img.shields.io/badge/accounts-EIP--1167_clones-1B3158?style=flat-square" alt="EIP-1167 clones"></a>
@@ -42,8 +42,18 @@ from the Launch and Trade contract sets. Launch's deployed contracts stay in
 
 ## Deployment
 
-None yet. The three contracts are a candidate, not deployed on either network. Arc testnet comes first, with its own
-deployment record and release evidence in this repository and a separate release authorization per network.
+Arc testnet only, version 1.0.0-beta.1, deployed on 10 October 2026 from commit `e1210d5`. Mainnet is not deployed and
+needs its own release authorization.
+
+| Contract | Address (testnet, chain 5042002) | Mutability |
+| --- | --- | --- |
+| AgentAccountFactory | [`0x6D56A15c25782FF638943A4E81A1eD1ea862C9Bd`](https://explorer.testnet.arc.io/address/0x6D56A15c25782FF638943A4E81A1eD1ea862C9Bd) | immutable |
+| AgentPolicyRegistry | [`0xcfCDA6a022314eA7Ae995cCf88e4eeB3A8802C69`](https://explorer.testnet.arc.io/address/0xcfCDA6a022314eA7Ae995cCf88e4eeB3A8802C69) | immutable |
+| AgentAccount (implementation) | [`0xD11567fDfc9833E39E7EEbB0964c7bB7f4FF40b5`](https://explorer.testnet.arc.io/address/0xD11567fDfc9833E39E7EEbB0964c7bB7f4FF40b5) | immutable |
+
+Full record: [`deployments/5042002.json`](deployments/5042002.json). The runtime bytecode of all three matches this
+repository's build (`script/verify-agent-accounts.py`), and the source is published on Sourcify (full match) and
+the explorer.
 
 The inputs are in [`deployments/manifest-5042002.json`](deployments/manifest-5042002.json) (testnet) and
 [`deployments/manifest-5042.json`](deployments/manifest-5042.json) (mainnet). Every Launch address in them must equal
@@ -90,9 +100,9 @@ What a stolen agent key can lose per period, the trust model, migration and gas 
 
 | File | Role | Mutability |
 | --- | --- | --- |
-| [`AgentAccount.sol`](src/AgentAccount.sol) | The account implementation behind every clone. Holds the funds, the per-token cost basis and the bound referrer; runs the typed agent trades and the owner's withdrawals. No generic execute, delegatecall, upgrade or selfdestruct; `isValidSignature` always fails. | immutable, not deployed |
-| [`AgentPolicyRegistry.sol`](src/AgentPolicyRegistry.sol) | One per factory, deployed by its constructor. Every account's owner, policy, agents, allowlist, delay, widening queue, owner pause and period usage; authorizes each agent call and charges each trade to the caps. No admin and no owner of its own. | immutable, not deployed |
-| [`AgentAccountFactory.sol`](src/AgentAccountFactory.sol) | Creates and records accounts, holds the beta policy ceilings and the guardian pause of agent functions. Holds no funds. | immutable, not deployed |
+| [`AgentAccount.sol`](src/AgentAccount.sol) | The account implementation behind every clone. Holds the funds, the per-token cost basis and the bound referrer; runs the typed agent trades and the owner's withdrawals. No generic execute, delegatecall, upgrade or selfdestruct; `isValidSignature` always fails. | immutable, testnet |
+| [`AgentPolicyRegistry.sol`](src/AgentPolicyRegistry.sol) | One per factory, deployed by its constructor. Every account's owner, policy, agents, allowlist, delay, widening queue, owner pause and period usage; authorizes each agent call and charges each trade to the caps. No admin and no owner of its own. | immutable, testnet |
+| [`AgentAccountFactory.sol`](src/AgentAccountFactory.sol) | Creates and records accounts, holds the beta policy ceilings and the guardian pause of agent functions. Holds no funds. | immutable, testnet |
 
 Shared types and policy maths: [`libraries/AgentTypes.sol`](src/libraries/AgentTypes.sol),
 [`libraries/AgentPolicyLib.sol`](src/libraries/AgentPolicyLib.sol). Interfaces in [`src/interfaces/`](src/interfaces).

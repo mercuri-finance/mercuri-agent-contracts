@@ -13,7 +13,7 @@ the fix moves.
 ## Scope
 
 The contracts in `src/`, `AgentAccount`, `AgentAccountFactory` and the `AgentPolicyRegistry` the factory deploys, and
-the deployment and verification scripts in `script/`. Nothing is deployed yet; once it is, the scope is the addresses
+the deployment and verification scripts in `script/`. The scope covers the addresses
 in the deployment records under `deployments/` and the accounts their factories create. The dependencies under `lib/`
 are upstream code, and Launch's contracts are in their own public repository; report defects in them there as well.
 

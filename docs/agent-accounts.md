@@ -1,6 +1,6 @@
 # Mercurifi Agent Accounts: contracts
 
-Status: candidate, **not deployed** on either network. Authoritative design: the agent accounts spec of 9 October 2026
+Status: **deployed on Arc testnet** (1.0.0-beta.1, [`deployments/5042002.json`](../deployments/5042002.json)); not deployed on mainnet. Authoritative design: the agent accounts spec of 9 October 2026
 (sections 4, 5, 10 to 12). This page covers what the contracts in [`src/`](../src) do, what they trust,
 what a stolen agent key can lose, what can never change, how users migrate, gas, and the release evidence.
 

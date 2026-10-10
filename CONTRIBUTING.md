@@ -1,7 +1,7 @@
 # Contributing
 
-This public repository owns the Mercurifi Agent Accounts contracts, their tests and release tooling. Nothing here is
-deployed yet; once it is, anyone can read the code behind the addresses, rebuild it and check the bytecode. The
+This public repository owns the Mercurifi Agent Accounts contracts, their tests and release tooling. The testnet deployment
+record is in `deployments/`; anyone can read the code behind the addresses, rebuild it and check the bytecode. The
 contracts are immutable, so a change to a deployed contract is a new reviewed release, a new deployment and a migration
 for owners. Pull requests are reviewed, but merging one never authorizes a contract transaction.
 
