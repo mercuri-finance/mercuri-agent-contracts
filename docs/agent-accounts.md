@@ -150,6 +150,11 @@ logs of the agent tests, local fixture unless stated:
 | Agent curve sell | 86,360 |
 | Agent pool buy through the deployed testnet Universal Router and LaunchHook (fork, first action, cold; measured at `86cc00d`, seeds `0x5042` and `0x5042002`) | 420,219 |
 | Agent pool sell, same pool (fork; measured at `86cc00d`, both seeds) | 235,046 |
+| Agent launch with a 50 USDC initial buy through the deployed testnet Launch factory (fork at block 66,497,000; isolated call, cold) | 2,349,421 |
+| Agent creator fee claim from the deployed testnet FeeManager (fork at block 66,497,000; isolated call, cold) | 79,161 |
+| Agent curve buy that completes a testnet curve and graduates it (Arc node `eth_call` at block 66,497,000, account warm in the call) | 857,326 |
+| Agent curve sell while `GraduationPending` (Arc node, same block, warm) | 85,716 |
+| Agent pool buy / sell on the new pool with Arc's real USDC and Permit2 (Arc node, same block, warm) | 301,705 / 174,466 |
 | `createAccount` with referrer binding and a first agent | 353,719 |
 | Graduating agent buy, minimum call gas (cold) | 1,254,882 |
 | `revokeAgent` | 45,879 |
@@ -228,7 +233,7 @@ for `src/**`, no metadata hash. Missing evidence is pending, not pass. Final run
 | Deployment record writer | n/a | `write-agent-accounts-record.py`: writes `<chainId>.json` only from a completed broadcast and only for a manifest that passes the preflight; links the record into place so an existing or racing record is never overwritten; names only HEAD of a clean tree as `sourceRevision`; the verifier's live mode reads only that record and refuses a block before `factoryDeployBlock` | `python3 script/write-agent-accounts-record.py --self-test` (in gate) and the verifier's record self-test | Pass at `86cc00d`: 54/54; record self-test passed | Run against the real broadcast at the testnet deployment |
 | Behaviour, attack, fuzz, invariant tests | n/a | 213 agent tests | `bash script/check-contracts.sh` (seed `0x5042`) | Pass at `86cc00d`: 213 passed, 0 skipped (fork included, public RPC); snapshot check 194 passed | None |
 | Stress | n/a | Gate with `--stress`: 10,000-run fuzz pass (fork suite included), then the agent invariants alone at 1,024 x 256 with their own counterexample directory | `ARC_LOCAL_FORK_RPC=https://rpc.testnet.arc.io AGENT_FORK_CHAIN_ID=5042002 AGENT_INVARIANT_STATS=true bash script/check-contracts.sh --stress` | Pass at `86cc00d`: exit 0 in 23 min 51 s; 10,000-run fuzz 207 passed; agent invariants 6 passed at 1,024 x 256 (262,144 calls each, 0 reverts, no counterexample); depth-256 (6,150 runs) successful-step ratio 87.70% mean, 80.86% min, successful account-call ratio 82.82% mean, 76.88% min (floor 60%); 14,134 queue expiries, at least 1 every run | None |
-| Pinned fork | n/a | Agent pool buy and sell (ERC-20 and Permit2 allowances back to zero; Alchemy URLs refused) through the deployed testnet Universal Router and LaunchHook on graduated token `0x97B4…eE84` at block 65,301,435, account deployed by the production script | `ARC_LOCAL_FORK_RPC=https://rpc.testnet.arc.io forge test --match-contract AgentPoolForkTest` (skipped without `ARC_LOCAL_FORK_RPC`) | Pass at `86cc00d` under seeds `0x5042` and `0x5042002`: pool buy 420,219 gas, sell 235,046 | Spec 10's other fork cases and a mainnet fork: see "Before testnet sign-off" below |
+| Pinned fork | n/a | `AgentPoolForkTest`: agent pool buy and sell (ERC-20 and Permit2 allowances back to zero; Alchemy URLs refused) through the deployed testnet Universal Router and LaunchHook on graduated token `0x97B4…eE84` at block 65,301,435, account deployed by the production script. `AgentLaunchForkTest`: spec 10's other fork cases against the deployed testnet agent factory and registry (`deployments/5042002.json`, never a fresh deployment) at block 66,497,000; see "Spec 10 fork cases" below | `ARC_LOCAL_FORK_RPC=https://rpc.testnet.arc.io forge test --match-contract 'AgentPoolForkTest\|AgentLaunchForkTest'` (skipped without `ARC_LOCAL_FORK_RPC`; the Arc node cases also skip on a loopback Anvil fork) | Pass at `86cc00d` under seeds `0x5042` and `0x5042002`: pool buy 420,219 gas, sell 235,046. `AgentLaunchForkTest`: 6 passed against the public testnet RPC (gas in section 8) | A mainnet fork, once the accounts are deployed there |
 | Gas | n/a | Snapshot `.gas-snapshot` (193 entries); identical to the reviewed snapshot except the four `DeployAgentAccountsTest` entries, whose test no longer reads a Trade manifest | `forge snapshot --check ...` (in gate) | Pass at `86cc00d` | None |
 | Size | EIP-170 24,576 B | 15,387 / 3,855 / 17,838 B | `forge build --sizes` | Pass | None |
 | Arc per-tx gas cap | Unverified (ruling: likely 16,777,216) | Verified on testnet (section 7) | `eth_estimateGas` probe, block 66,330,102 | 16,777,216 | Mainnet probe pending |
@@ -236,31 +241,49 @@ for `src/**`, no metadata hash. Missing evidence is pending, not pass. Final run
 | Static analysis | n/a | Slither 0.11.3, per file (`AgentAccount.sol`; `AgentAccountFactory.sol`, which compiles the registry), `lib/` filtered; whole-repo mode fails on duplicate `ERC20` names | `bash script/run-slither.sh` (offline, about 15 s; in the gate when Slither 0.11.3 is installed); triage in [`docs/reports/2026-10-09-agent-accounts-slither.md`](reports/2026-10-09-agent-accounts-slither.md) | Pass at `86cc00d`: 87 results (50 + 37), per target and detector equal to the triaged baseline; 0 true positives | None |
 | Independent review and external audit | n/a | Required by spec 10 before testnet and mainnet respectively | n/a | Pending (the branch's final review approved the code for testnet at `6a559b3`, before the move) | Both |
 
-### Before testnet sign-off
+### Spec 10 fork cases
 
-The pinned fork test proves the graduated pool buy and sell only. Spec 10's remaining fork cases are proven in the
-testnet smoke, against the deployed testnet Launch contracts and the new testnet factory, before the testnet is signed
-off:
+`test/integration/AgentLaunchFork.t.sol` proves spec 10's remaining fork cases at testnet block 66,497,000 against
+the deployed agent factory and registry and the deployed Launch contracts. The curve it buys up is a real testnet launch
+(`0x93f8…03F1`, in `Trading` at that block). Two execution modes:
 
-- a **graduating buy**: the agent curve buy that graduates the curve, charged at its measured native delta (refund
-  included) against the caps;
-- a **sell during `GraduationPending`** (and a buy refused with `NotTrading` in the same state);
-- a **launch with an initial buy**, with the creator and the referrer bound at Launch's FeeManager;
-- a **fee claim** (`claimFees`) of the account's creator fees;
-- a **blocklisted-owner withdraw**, expected to revert (spec Q9: a blocklisted owner cannot withdraw and nothing can
-  override it); the live blocklist is not ours to set, so this case runs on a testnet fork that impersonates USDC's
-  blocklister;
-- the **real USDC approve and Permit2 path**: the pool trade's ERC-20 approval and Permit2 allowance against Arc's real
-  USDC system contract, both back to zero after the trade.
+- **Foundry fork**, for the paths that move only native value:
+  - a **launch with an initial buy**: the account is the creator at Launch's FeeManager; the referrer bound at account
+    creation is the one paid on the initial buy's fee, and the launch locks the binding; an account without a referrer
+    leaves the referral share with the platform for good; a referrer equal to the account's own address is refused at
+    creation;
+  - a **creator fee claim** (`claimFees`): the whole claim lands in the account itself, and neither the owner nor the
+    agent receives anything.
+- **Arc's node**, through `eth_call` at the same block, for the paths that move USDC or need the blocklist. Arc's USDC
+  at `0x3600…0000` moves value through the Native Coin Authority precompile (`0x1800…0000`), and its blocklist lives in
+  the Native Coin Control precompile (`0x1800…0001`). A Foundry fork has neither, so on a fork every USDC transfer
+  reverts, graduation included, and nobody can be blocklisted. These cases are not modelled. A scenario contract
+  (`test/utils/AgentLiveScenario.sol`) is placed by state override and run by Arc's node against the live state; the
+  test asserts the result, and nothing persists:
+  - a **graduating buy**: the agent's buy completes the curve and graduates it in the same call. The account is charged
+    its measured native delta, refund netted and rounded up to usdc6, and its basis holds the remaining supply;
+  - a **sell during `GraduationPending`**: the real USDC blocklister blocklists the GraduationManager, so the agent's
+    completing buy leaves the curve `GraduationPending`. A buy is refused `NotTrading`, and the sell is charged its
+    basis value and reopens `Trading`. Once the blocklisting is lifted, the next completing buy graduates the curve;
+  - a **blocklisted-owner withdraw**: the real blocklister blocklists the owner. `withdraw` (native and the USDC ERC-20
+    view), `withdrawMany` and the agent's `sweepToOwner` all revert at Arc's blocklist. The agent cannot withdraw, take
+    ownership or sweep USDC through its ERC-20 view, and the account's balance is untouched. Launch tokens are outside
+    the USDC blocklist and still withdraw. An EOA on Arc testnet's seeded blocklist cannot even submit the call: the
+    node refuses it (spec Q9: nothing can override this);
+  - the **real USDC approve and Permit2 path**: after a graduation, a pool buy and sell through the deployed Universal
+    Router use Arc's real USDC `approve`, Permit2 allowance and `transferFrom`. Both views of the balance agree, the
+    spend is the native delta, and every allowance is back to zero.
 
-Each case records the transaction hash and gas in the testnet smoke report; a mainnet fork follows before mainnet.
+The testnet smoke still records transaction hashes for these flows on the live chain; a mainnet fork follows once the
+accounts are deployed on mainnet.
 
 ## 11. Open gaps (pending before contract readiness)
 
 - Independent internal multi-auditor review of the whole agent contract set, then an external audit before mainnet
   (spec 10). No mainnet deployment with an open finding.
 - Live runtime comparison after the testnet deployment (`verify-agent-accounts.py --rpc ... --block ... --record`).
-- The remaining spec 10 fork cases (section 10, "Before testnet sign-off") in the testnet smoke, and a mainnet fork.
+- Spec 10's fork cases on a mainnet fork, once the accounts are deployed on mainnet (the testnet cases pass; section
+  10, "Spec 10 fork cases").
 - Mainnet per-tx gas cap probe and mainnet constructor simulation (no public mainnet RPC reachable read-only on
   9 October 2026).
 - Owner decisions D1 to D8 were taken at the spec's recommendations; a different choice costs a contract change before

@@ -197,8 +197,9 @@ compiler profiles alone. [`lib-versions.md`](lib-versions.md) records every pin.
 
 The gate checks the source manifest, formatting, NatSpec, the record writer's and the verifier's offline self-tests and
 both manifests, then runs every test with seed `0x5042`, the gas snapshot and, when installed, Slither. For the stress
-pass (a 10,000-run fuzz pass, the pinned fork test and the deep invariant campaign of 1,024 runs at depth 256), point
-it at Arc's public RPC or a loopback fork of it, never a paid provider:
+pass (a 10,000-run fuzz pass, the pinned fork tests and the deep invariant campaign of 1,024 runs at depth 256), point
+it at Arc's public RPC or a loopback fork of it, never a paid provider. The fork cases that need Arc's USDC precompiles
+run on Arc's own node through `eth_call`, so they skip on a loopback fork:
 
 ```sh
 ARC_LOCAL_FORK_RPC=https://rpc.testnet.arc.io AGENT_FORK_CHAIN_ID=5042002 bash script/check-contracts.sh --stress
