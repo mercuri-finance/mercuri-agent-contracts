@@ -3,7 +3,7 @@ pragma solidity ^0.8.26;
 
 import {IAgentPolicyRegistry} from "./interfaces/IAgentPolicyRegistry.sol";
 import {IAgentAccountFactory} from "./interfaces/IAgentAccountFactory.sol";
-import {AgentPolicyLib} from "./AgentPolicyLib.sol";
+import {AgentPolicyLib} from "./libraries/AgentPolicyLib.sol";
 import {
     Policy,
     Agent,
@@ -23,7 +23,7 @@ import {
     Q_DELAY,
     Q_OWNER,
     Q_SET_AGENT
-} from "./AgentTypes.sol";
+} from "./libraries/AgentTypes.sol";
 
 /// @notice Configuration and usage of every Mercurifi agent account of one factory. Owners manage their account
 ///         here; accounts ask it to authorise each agent call and to charge each trade to the period caps.

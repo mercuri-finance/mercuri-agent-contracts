@@ -8,7 +8,7 @@ import {AgentFixture} from "./AgentFixture.sol";
 import {AgentAccount} from "../src/AgentAccount.sol";
 import {IAgentAccount} from "../src/interfaces/IAgentAccount.sol";
 import {IAgentPolicyRegistry} from "../src/interfaces/IAgentPolicyRegistry.sol";
-import {Policy, InitParams, P_BUY, P_SELL, ACTION_BUY, ACTION_SELL} from "../src/AgentTypes.sol";
+import {Policy, InitParams, P_BUY, P_SELL, ACTION_BUY, ACTION_SELL} from "../src/libraries/AgentTypes.sol";
 
 /// @dev Task 3: capped curve buys and sells with cost basis (spec sections 4.2, 4.5 and 4.6).
 contract AgentCurveTest is AgentFixture {

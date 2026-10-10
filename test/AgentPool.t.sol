@@ -21,10 +21,10 @@ import {IAllowanceTransfer} from "permit2/src/interfaces/IAllowanceTransfer.sol"
 import {AgentFixture} from "./AgentFixture.sol";
 import {ICanonicalRouter} from "./utils/UniversalRouterHarness.sol";
 import {AgentAccount} from "../src/AgentAccount.sol";
-import {AgentPolicyLib} from "../src/AgentPolicyLib.sol";
+import {AgentPolicyLib} from "../src/libraries/AgentPolicyLib.sol";
 import {IAgentAccount} from "../src/interfaces/IAgentAccount.sol";
 import {IAgentPolicyRegistry} from "../src/interfaces/IAgentPolicyRegistry.sol";
-import {Policy, InitParams, P_BUY, P_SELL, ACTION_POOL_BUY, ACTION_POOL_SELL} from "../src/AgentTypes.sol";
+import {Policy, InitParams, P_BUY, P_SELL, ACTION_POOL_BUY, ACTION_POOL_SELL} from "../src/libraries/AgentTypes.sol";
 
 /// @dev Stands in for the Universal Router (its code is etched at the router's address): it pulls `amountIn` of the
 ///      input through Permit2, as SETTLE_ALL would, so both allowances reach zero, and delivers no output.

@@ -5,7 +5,7 @@ import {UniversalRouterHarness} from "./utils/UniversalRouterHarness.sol";
 import {AgentAccount} from "../src/AgentAccount.sol";
 import {AgentAccountFactory} from "../src/AgentAccountFactory.sol";
 import {AgentPolicyRegistry} from "../src/AgentPolicyRegistry.sol";
-import {Policy, InitParams, P_ALL} from "../src/AgentTypes.sol";
+import {Policy, InitParams, P_ALL} from "../src/libraries/AgentTypes.sol";
 
 /// @dev The real Launch system and Universal Router (from `UniversalRouterHarness`), plus an agent account
 ///      implementation and factory wired to them. `factory` is the LaunchFactory; the agent factory is `agentFactory`.

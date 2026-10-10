@@ -2,7 +2,7 @@
 pragma solidity ^0.8.26;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {IAgentPolicyRegistry} from "./interfaces/IAgentPolicyRegistry.sol";
+import {IAgentPolicyRegistry} from "../interfaces/IAgentPolicyRegistry.sol";
 import {
     Policy,
     MAX_BPS,

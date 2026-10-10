@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
-import {Policy, InitParams} from "../AgentTypes.sol";
+import {Policy, InitParams} from "../libraries/AgentTypes.sol";
 
 /// @notice Creates Mercurifi agent accounts, records which addresses are genuine accounts, holds the beta policy
 ///         ceilings and the guardian pause of agent functions. Immutable; holds no funds.

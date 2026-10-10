@@ -13,8 +13,8 @@ import {AgentFixture} from "./AgentFixture.sol";
 import {AgentAccount} from "../src/AgentAccount.sol";
 import {IAgentAccount} from "../src/interfaces/IAgentAccount.sol";
 import {IAgentPolicyRegistry} from "../src/interfaces/IAgentPolicyRegistry.sol";
-import {AgentPolicyLib} from "../src/AgentPolicyLib.sol";
-import {Policy, InitParams, P_ALL, P_BUY, QUEUE_TTL} from "../src/AgentTypes.sol";
+import {AgentPolicyLib} from "../src/libraries/AgentPolicyLib.sol";
+import {Policy, InitParams, P_ALL, P_BUY, QUEUE_TTL} from "../src/libraries/AgentTypes.sol";
 
 /// @dev A token a stranger sends to an account. Every transfer out of the account tries to re-enter it.
 contract ReentrantToken is ERC20 {

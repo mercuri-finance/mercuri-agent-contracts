@@ -22,7 +22,7 @@ import {GraduationManager} from "@mercuri/launch/GraduationManager.sol";
 import {CreateParams} from "@mercuri/launch/libraries/LaunchTypes.sol";
 import {IAgentAccount} from "./interfaces/IAgentAccount.sol";
 import {IAgentPolicyRegistry} from "./interfaces/IAgentPolicyRegistry.sol";
-import {AgentPolicyLib} from "./AgentPolicyLib.sol";
+import {AgentPolicyLib} from "./libraries/AgentPolicyLib.sol";
 import {
     LaunchRequest,
     Policy,
@@ -42,7 +42,7 @@ import {
     ACTION_SWEEP,
     SCALE,
     HIGH_WATER_SCALE
-} from "./AgentTypes.sol";
+} from "./libraries/AgentTypes.sol";
 
 /// @notice The one Universal Router entry point agent accounts call.
 interface IUniversalRouterExecute {

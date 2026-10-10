@@ -22,7 +22,7 @@ import {
     ACTION_LAUNCH,
     ACTION_CLAIM,
     ACTION_SWEEP
-} from "../src/AgentTypes.sol";
+} from "../src/libraries/AgentTypes.sol";
 
 /// @dev Task 4: agent launches, creator-fee claims and sweeps to the owner (spec section 4.6).
 contract AgentLaunchTest is AgentFixture {

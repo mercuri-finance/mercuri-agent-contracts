@@ -12,7 +12,7 @@ import {DeployAgentAccounts} from "../script/DeployAgentAccounts.s.sol";
 import {AgentAccount} from "../src/AgentAccount.sol";
 import {AgentAccountFactory} from "../src/AgentAccountFactory.sol";
 import {AgentPolicyRegistry} from "../src/AgentPolicyRegistry.sol";
-import {InitParams, P_ALL} from "../src/AgentTypes.sol";
+import {InitParams, P_ALL} from "../src/libraries/AgentTypes.sol";
 import {NativeUsdcShim} from "./utils/NativeUsdcShim.sol";
 
 /// @dev Spec section 10 pinned fork: an agent account deployed by the real deploy script against Arc testnet's

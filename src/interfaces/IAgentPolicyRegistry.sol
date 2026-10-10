@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
-import {Policy, Agent, InitParams} from "../AgentTypes.sol";
+import {Policy, Agent, InitParams} from "../libraries/AgentTypes.sol";
 
 /// @notice Configuration and usage of every Mercurifi agent account of one factory: owner, policy, agents, allowlist,
 ///         the delayed-widening queue, the owner pause and the per-period usage counters. One immutable singleton per

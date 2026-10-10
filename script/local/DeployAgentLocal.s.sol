@@ -18,7 +18,7 @@ import {HookMiner} from "../../test/utils/launch/HookMiner.sol";
 import {DefaultConfig} from "../../test/utils/launch/DefaultConfig.sol";
 import {AgentAccount} from "../../src/AgentAccount.sol";
 import {AgentAccountFactory} from "../../src/AgentAccountFactory.sol";
-import {Policy} from "../../src/AgentTypes.sol";
+import {Policy} from "../../src/libraries/AgentTypes.sol";
 import {AnvilUsdcStub} from "./AnvilUsdcStub.sol";
 
 /// @notice LOCAL ONLY. Deploys v4 core, Permit2, the Universal Router, V4Quoter, the Launch system and the Agent

@@ -6,7 +6,7 @@ import {AgentDeployBase} from "./AgentDeployBase.sol";
 import {AgentAccount} from "../src/AgentAccount.sol";
 import {AgentAccountFactory} from "../src/AgentAccountFactory.sol";
 import {AgentPolicyRegistry} from "../src/AgentPolicyRegistry.sol";
-import {Policy} from "../src/AgentTypes.sol";
+import {Policy} from "../src/libraries/AgentTypes.sol";
 
 /// @notice Deploys the Mercurifi agent account implementation and its factory (which deploys the policy registry) from
 ///         `deployments/agent-accounts-manifest-<chainId>.json`. Contains no key: pass `--account` or `--ledger`.

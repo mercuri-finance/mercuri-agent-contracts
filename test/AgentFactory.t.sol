@@ -6,7 +6,7 @@ import {AgentAccount} from "../src/AgentAccount.sol";
 import {AgentAccountFactory} from "../src/AgentAccountFactory.sol";
 import {IAgentAccount} from "../src/interfaces/IAgentAccount.sol";
 import {IAgentPolicyRegistry} from "../src/interfaces/IAgentPolicyRegistry.sol";
-import {AgentPolicyLib} from "../src/AgentPolicyLib.sol";
+import {AgentPolicyLib} from "../src/libraries/AgentPolicyLib.sol";
 import {IAgentAccountFactory} from "../src/interfaces/IAgentAccountFactory.sol";
 import {
     Policy,
@@ -19,7 +19,7 @@ import {
     MAX_AGENT_TTL,
     MAX_ADMIN_PAUSE,
     F_MIN_TOKEN_AGE_BLOCKS
-} from "../src/AgentTypes.sol";
+} from "../src/libraries/AgentTypes.sol";
 
 contract AgentFactoryTest is AgentFixture {
     // ---------------------------------------------------------------- creation

@@ -8,7 +8,7 @@ import {AgentDeployBase} from "../script/AgentDeployBase.sol";
 import {AgentAccount} from "../src/AgentAccount.sol";
 import {AgentAccountFactory} from "../src/AgentAccountFactory.sol";
 import {AgentPolicyRegistry} from "../src/AgentPolicyRegistry.sol";
-import {Policy, InitParams} from "../src/AgentTypes.sol";
+import {Policy, InitParams} from "../src/libraries/AgentTypes.sol";
 
 /// @dev Exposes the deploy script's internal steps.
 contract AgentDeployHarness is DeployAgentAccounts {

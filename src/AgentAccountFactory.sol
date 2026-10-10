@@ -6,8 +6,8 @@ import {IAgentAccount} from "./interfaces/IAgentAccount.sol";
 import {IAgentAccountFactory} from "./interfaces/IAgentAccountFactory.sol";
 import {IAgentPolicyRegistry} from "./interfaces/IAgentPolicyRegistry.sol";
 import {AgentPolicyRegistry} from "./AgentPolicyRegistry.sol";
-import {AgentPolicyLib} from "./AgentPolicyLib.sol";
-import {Policy, InitParams, GUARDIAN_PAUSE, GUARDIAN_COOLDOWN, MAX_ADMIN_PAUSE} from "./AgentTypes.sol";
+import {AgentPolicyLib} from "./libraries/AgentPolicyLib.sol";
+import {Policy, InitParams, GUARDIAN_PAUSE, GUARDIAN_COOLDOWN, MAX_ADMIN_PAUSE} from "./libraries/AgentTypes.sol";
 
 /// @notice Creates Mercurifi agent accounts as EIP-1167 clones of one implementation, records them, holds the beta
 ///         policy ceilings and the guardian pause of agent functions.

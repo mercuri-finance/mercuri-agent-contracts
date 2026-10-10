@@ -7,7 +7,7 @@ import {ILaunchFactory} from "@mercuri/launch/interfaces/ILaunchFactory.sol";
 import {IFeeManager} from "@mercuri/launch/interfaces/IFeeManager.sol";
 import {IGraduationManager} from "@mercuri/launch/interfaces/IGraduationManager.sol";
 import {IAgentPolicyRegistry} from "./IAgentPolicyRegistry.sol";
-import {LaunchRequest} from "../AgentTypes.sol";
+import {LaunchRequest} from "../libraries/AgentTypes.sol";
 
 /// @notice A Mercurifi agent account: a per-user vault whose agent keys trade Launch tokens within owner-set caps and
 ///         can never withdraw. Each account is an EIP-1167 clone of one immutable implementation. It holds the funds,
