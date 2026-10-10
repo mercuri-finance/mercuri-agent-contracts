@@ -12,8 +12,9 @@
 <h1 align="center">Mercurifi Agent Accounts · contracts</h1>
 
 <p align="center">
-  <a href="deployments/manifest-5042002.json"><img src="https://img.shields.io/badge/Arc_testnet-target_chain_5042002-C3E6FF?style=flat-square" alt="Arc testnet target, chain 5042002"></a>
-  <a href="deployments/5042002.json"><img src="https://img.shields.io/badge/release-1.0.0--beta.1_testnet-0A0A0A?style=flat-square" alt="release 1.0.0-beta.1 on testnet"></a>
+  <a href="deployments/5042.json"><img src="https://img.shields.io/badge/Arc_mainnet-chain_5042-C3E6FF?style=flat-square" alt="Arc mainnet, chain 5042"></a>
+  <a href="deployments/5042002.json"><img src="https://img.shields.io/badge/Arc_testnet-chain_5042002-C3E6FF?style=flat-square" alt="Arc testnet, chain 5042002"></a>
+  <a href="deployments/5042.json"><img src="https://img.shields.io/badge/release-1.0.0--beta.1-0A0A0A?style=flat-square" alt="release 1.0.0-beta.1"></a>
   <a href="#build-and-verify"><img src="https://img.shields.io/badge/build-pinned-0A0A0A?style=flat-square" alt="build pinned"></a>
   <a href="foundry.toml"><img src="https://img.shields.io/badge/solidity-0.8.26-0A0A0A?style=flat-square" alt="Solidity 0.8.26"></a>
   <a href="src/AgentAccount.sol"><img src="https://img.shields.io/badge/accounts-EIP--1167_clones-0A0A0A?style=flat-square" alt="EIP-1167 clones"></a>
@@ -43,8 +44,16 @@ from the Launch and Trade contract sets. Launch's deployed contracts stay in
 
 ## Deployment
 
-Arc testnet only, version 1.0.0-beta.1, deployed on 10 October 2026 from commit `e1210d5`. Mainnet is not deployed and
-needs its own release authorization.
+Version 1.0.0-beta.1, on Arc mainnet and Arc testnet, both deployed on 10 October 2026 from the same contract source
+(testnet from commit `e1210d5`, mainnet from `b882653`, whose `src/` is identical). **No third-party audit has been
+performed yet**: mainnet went live on the owner's decision after the testnet run and the reviews described under
+[Security](#security). Start with small amounts.
+
+| Contract | Address (mainnet, chain 5042) | Mutability |
+| --- | --- | --- |
+| AgentAccountFactory | [`0x816C7269FDcf621b7d8cb99A5AfbE9daddBd3b58`](https://explorer.arc.io/address/0x816C7269FDcf621b7d8cb99A5AfbE9daddBd3b58) | immutable |
+| AgentPolicyRegistry | [`0x318A0e1353E812A36FC7C52a88Af8D6A96909483`](https://explorer.arc.io/address/0x318A0e1353E812A36FC7C52a88Af8D6A96909483) | immutable |
+| AgentAccount (implementation) | [`0x36acC3Eb67571E592A45c88656c4B3c4f7Fb7beE`](https://explorer.arc.io/address/0x36acC3Eb67571E592A45c88656c4B3c4f7Fb7beE) | immutable |
 
 | Contract | Address (testnet, chain 5042002) | Mutability |
 | --- | --- | --- |
@@ -52,9 +61,9 @@ needs its own release authorization.
 | AgentPolicyRegistry | [`0xcfCDA6a022314eA7Ae995cCf88e4eeB3A8802C69`](https://explorer.testnet.arc.io/address/0xcfCDA6a022314eA7Ae995cCf88e4eeB3A8802C69) | immutable |
 | AgentAccount (implementation) | [`0xD11567fDfc9833E39E7EEbB0964c7bB7f4FF40b5`](https://explorer.testnet.arc.io/address/0xD11567fDfc9833E39E7EEbB0964c7bB7f4FF40b5) | immutable |
 
-Full record: [`deployments/5042002.json`](deployments/5042002.json). The runtime bytecode of all three matches this
-repository's build (`script/verify-agent-accounts.py`), and the source is published on Sourcify (full match) and
-the explorer.
+Full records: [`deployments/5042.json`](deployments/5042.json) (mainnet) and
+[`deployments/5042002.json`](deployments/5042002.json) (testnet). On both networks the runtime bytecode of all three
+matches this repository's build (`script/verify-agent-accounts.py`), and the source is published on Sourcify.
 
 The inputs are in [`deployments/manifest-5042002.json`](deployments/manifest-5042002.json) (testnet) and
 [`deployments/manifest-5042.json`](deployments/manifest-5042.json) (mainnet). Every Launch address in them must equal
@@ -240,8 +249,8 @@ constructor arguments match the manifest, and never overwrites a record.
 | Governance | The factory's admin is Launch's timelock: it can replace the guardian and lift, shorten or extend an active pause, never start one or touch an account. The guardian can pause agent functions for 72 hours. What each can do: [`SECURITY.md`](SECURITY.md). |
 
 The contract set was reviewed before the move to this repository, and the final review approved it for testnet; the
-static analysis is triaged in [`docs/reports/`](docs/reports). An independent review of the whole set is required
-before testnet sign-off and an external audit before mainnet.
+static analysis is triaged in [`docs/reports/`](docs/reports). The spec asked for an external audit before mainnet;
+the owner chose to deploy mainnet before one, and an audit remains open.
 
 These were AI-assisted reviews, not an audit by a security firm; no third-party audit has been performed yet. Weigh
 that before relying on the contracts. To report a vulnerability, see [`SECURITY.md`](SECURITY.md).

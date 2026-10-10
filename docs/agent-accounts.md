@@ -1,6 +1,6 @@
 # Mercurifi Agent Accounts: contracts
 
-Status: **deployed on Arc testnet** (1.0.0-beta.1, [`deployments/5042002.json`](../deployments/5042002.json)); not deployed on mainnet. Authoritative design: the agent accounts spec of 9 October 2026
+Status: **deployed on Arc mainnet and testnet** (1.0.0-beta.1, [`deployments/5042.json`](../deployments/5042.json) and [`deployments/5042002.json`](../deployments/5042002.json)), with no third-party audit yet. Authoritative design: the agent accounts spec of 9 October 2026
 (sections 4, 5, 10 to 12). This page covers what the contracts in [`src/`](../src) do, what they trust,
 what a stolen agent key can lose, what can never change, how users migrate, gas, and the release evidence.
 
@@ -239,7 +239,7 @@ for `src/**`, no metadata hash. Missing evidence is pending, not pass. Final run
 | Arc per-tx gas cap | Unverified (ruling: likely 16,777,216) | Verified on testnet (section 7) | `eth_estimateGas` probe, block 66,330,102 | 16,777,216 | Mainnet probe pending |
 | Upgradeability and storage | n/a | No proxies; nothing to upgrade, no storage layout to preserve | Code review | Not applicable | Documented: no code rollback |
 | Static analysis | n/a | Slither 0.11.3, per file (`AgentAccount.sol`; `AgentAccountFactory.sol`, which compiles the registry), `lib/` filtered; whole-repo mode fails on duplicate `ERC20` names | `bash script/run-slither.sh` (offline, about 15 s; in the gate when Slither 0.11.3 is installed); triage in [`docs/reports/2026-10-09-agent-accounts-slither.md`](reports/2026-10-09-agent-accounts-slither.md) | Pass at `86cc00d`: 87 results (50 + 37), per target and detector equal to the triaged baseline; 0 true positives | None |
-| Independent review and external audit | n/a | Required by spec 10 before testnet and mainnet respectively | n/a | Pending (the branch's final review approved the code for testnet at `6a559b3`, before the move) | Both |
+| Independent review and external audit | n/a | Required by spec 10 before testnet and mainnet respectively | n/a | External audit pending; mainnet deployed on 10 Oct 2026 by owner decision before it (the final review approved the code for testnet at `6a559b3`) | Both |
 
 ### Spec 10 fork cases
 
@@ -279,8 +279,8 @@ accounts are deployed on mainnet.
 
 ## 11. Open gaps (pending before contract readiness)
 
-- Independent internal multi-auditor review of the whole agent contract set, then an external audit before mainnet
-  (spec 10). No mainnet deployment with an open finding.
+- Independent internal multi-auditor review of the whole agent contract set, then an external audit (spec 10). Mainnet
+  was deployed on 10 Oct 2026 by owner decision before the audit; no finding was open.
 - Live runtime comparison after the testnet deployment (`verify-agent-accounts.py --rpc ... --block ... --record`).
 - Spec 10's fork cases on a mainnet fork, once the accounts are deployed on mainnet (the testnet cases pass; section
   10, "Spec 10 fork cases").

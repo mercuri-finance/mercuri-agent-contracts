@@ -81,5 +81,5 @@ section 6.
   addresses, wired exactly as the manifest says.
 
 The contract set was reviewed before it moved to this repository, and the final review approved it for testnet. These
-were AI-assisted reviews; an independent review of the whole set is required before testnet sign-off and an external
-audit before mainnet. No professional third-party audit has been performed yet.
+were AI-assisted reviews. Mainnet was deployed on the owner's decision before an external audit; no professional
+third-party audit has been performed yet, and one remains open.
