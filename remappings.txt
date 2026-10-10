@@ -1,0 +1,8 @@
+forge-std/=lib/forge-std/src/
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+@openzeppelin/contracts-upgradeable/=lib/mercuri-launch-contracts/lib/openzeppelin-contracts-upgradeable/contracts/
+@uniswap/v4-core/=lib/mercuri-launch-contracts/lib/v4-periphery/lib/v4-core/
+@uniswap/v4-periphery/=lib/mercuri-launch-contracts/lib/v4-periphery/
+permit2/=lib/mercuri-launch-contracts/lib/v4-periphery/lib/permit2/
+solmate/=lib/mercuri-launch-contracts/lib/v4-periphery/lib/v4-core/lib/solmate/
+@mercuri/launch/=lib/mercuri-launch-contracts/src/
