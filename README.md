@@ -12,25 +12,26 @@
 <h1 align="center">Mercurifi Agent Accounts · contracts</h1>
 
 <p align="center">
-  <a href="deployments/manifest-5042002.json"><img src="https://img.shields.io/badge/Arc_testnet-target_chain_5042002-43459D?style=flat-square" alt="Arc testnet target, chain 5042002"></a>
-  <a href="deployments/5042002.json"><img src="https://img.shields.io/badge/release-1.0.0--beta.1_testnet-1B3158?style=flat-square" alt="release 1.0.0-beta.1 on testnet"></a>
-  <a href="#build-and-verify"><img src="https://img.shields.io/badge/build-pinned-1B3158?style=flat-square" alt="build pinned"></a>
-  <a href="foundry.toml"><img src="https://img.shields.io/badge/solidity-0.8.26-1B3158?style=flat-square" alt="Solidity 0.8.26"></a>
-  <a href="src/AgentAccount.sol"><img src="https://img.shields.io/badge/accounts-EIP--1167_clones-1B3158?style=flat-square" alt="EIP-1167 clones"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1B3158?style=flat-square" alt="MIT license"></a>
+  <a href="deployments/manifest-5042002.json"><img src="https://img.shields.io/badge/Arc_testnet-target_chain_5042002-C3E6FF?style=flat-square" alt="Arc testnet target, chain 5042002"></a>
+  <a href="deployments/5042002.json"><img src="https://img.shields.io/badge/release-1.0.0--beta.1_testnet-0A0A0A?style=flat-square" alt="release 1.0.0-beta.1 on testnet"></a>
+  <a href="#build-and-verify"><img src="https://img.shields.io/badge/build-pinned-0A0A0A?style=flat-square" alt="build pinned"></a>
+  <a href="foundry.toml"><img src="https://img.shields.io/badge/solidity-0.8.26-0A0A0A?style=flat-square" alt="Solidity 0.8.26"></a>
+  <a href="src/AgentAccount.sol"><img src="https://img.shields.io/badge/accounts-EIP--1167_clones-0A0A0A?style=flat-square" alt="EIP-1167 clones"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0A0A0A?style=flat-square" alt="MIT license"></a>
 </p>
 
 <p align="center">
   <a href="https://launch.mercuri.finance">launch.mercuri.finance</a> ·
   <a href="https://trade.mercuri.finance">trade.mercuri.finance</a> ·
-  <a href="https://docs.mercuri.finance">docs.mercuri.finance</a>
+  <a href="https://docs.mercuri.finance">docs.mercuri.finance</a> ·
+  <a href="https://github.com/mercuri-finance/mercurifi-sdk">SDK (TypeScript, Python)</a>
 </p>
 
 The Solidity source of Mercurifi Agent Accounts: per-user vaults on Arc from which the owner's own bot or AI agent
 trades within caps the owner sets. Agent keys can buy and sell on Mercurifi Launch bonding curves, swap on graduated
 Launch pools through Uniswap's Universal Router, launch tokens and claim creator fees. They can never withdraw. Only the
 owner can withdraw, and only to itself. Contracts, the pinned sources they compile against, the deployment inputs and
-the release evidence. The backend, the SDK and the web app are separate.
+the release evidence. The backend, the [SDK](https://github.com/mercuri-finance/mercurifi-sdk) and the web app are separate.
 
 The accounts span Launch (curves, launches, fees) and the graduated pools, so they live in their own repository, apart
 from the Launch and Trade contract sets. Launch's deployed contracts stay in
