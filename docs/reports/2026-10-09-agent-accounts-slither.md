@@ -15,8 +15,9 @@ named `ERC20` and Slither stops with `Type not found contract ERC20`.
 **Verdict: 87 results, 0 true positives.** No result calls for a code change. The script fails when the per-target,
 per-detector counts differ from this triage, so a new result must be triaged here before the evidence is updated.
 Matches the independent final review's ad hoc run of the same version at `c8c6485` (same 87 results, line for line).
-After the move the sources live directly under `src/`; the re-run in this repository is pending the final run after
-the repo-parity step.
+Re-run in this repository at `86cc00d` (after the move and the repo-parity step, which moved `AgentTypes.sol` and
+`AgentPolicyLib.sol` to `src/libraries/` and changed only comments, NatSpec and import order): the same 87 results
+(50 + 37), equal per target and detector to the baseline; the targets and every location below are unchanged.
 
 Classes used below: **FP** false positive (the pattern is not present or cannot be reached as described);
 **By design** the pattern is present and intended, with the reason; **Style** naming or complexity only.
