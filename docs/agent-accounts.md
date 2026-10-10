@@ -161,13 +161,14 @@ policy, the first agent and the usage slots into the registry. At Arc gas prices
 
 ## 9. Deployment
 
-Inputs only, per network: [`deployments/manifest-5042002.json`](../deployments/manifest-5042002.json)
-and [`deployments/manifest-5042.json`](../deployments/manifest-5042.json). Launch
-addresses come from Launch's deployment record for the chain, the Universal Router and its runtime hash are the pins in
+Inputs only, per network: [`deployments/manifest-5042002.json`](../deployments/manifest-5042002.json) and
+[`deployments/manifest-5042.json`](../deployments/manifest-5042.json). Launch addresses come from Launch's deployment
+record for the chain, the Universal Router and its runtime hash are the pins in
 [`script/AgentDeployBase.sol`](../script/AgentDeployBase.sol) (reproduced by the preflight from the pinned upstream
-router source and the bytes observed on chain, [`docs/reports/2026-09-27-universal-router-comparison.json`](reports/2026-09-27-universal-router-comparison.json)),
-`admin` is the network's Launch timelock, `guardian` is the record's guardian (the Guardian Safe on
-mainnet, the testnet guardian key on testnet), and the ceilings are exactly spec 4.5. No deployed address is in them.
+router source and the bytes observed on chain,
+[`docs/reports/2026-09-27-universal-router-comparison.json`](reports/2026-09-27-universal-router-comparison.json)),
+`admin` is the network's Launch timelock, `guardian` is the record's guardian (the Guardian Safe on mainnet, the testnet
+guardian key on testnet), and the ceilings are exactly spec 4.5. No deployed address is in them.
 
 [`script/DeployAgentAccounts.s.sol`](../script/DeployAgentAccounts.s.sol) checks the manifest against those records
 and the beta ceilings, requires code at every dependency and the pinned router runtime (and, on mainnet, a guardian
@@ -196,24 +197,27 @@ three runtimes from `out/` with the manifest and record values in every immutabl
 
 ## 10. Release evidence
 
-Candidate: this repository after the repo-parity step (NatSpec edits in `src/`, which change the metadata hash). The
-evidence rows below are **pending final run after parity**; the move itself was checked at the initial commit
-`f11162d` (gate exit 0, byte-identical bytecode, Universal Router pin reproduced). The sources were moved from
-mercuri-trade-contracts at `5f71ef5`, where the code candidate was `6a559b3` and the independent final review approved it for testnet; `src/`
-is unchanged (same sha256 for all eight files), and rebuilding here at `f11162d` gave creation and runtime code for
-`AgentAccount`, `AgentAccountFactory` and `AgentPolicyRegistry` byte-identical to the build at `5f71ef5` (with
-`bytecode_hash = "none"` the only CBOR is the compiler version, so stripping it changes nothing). The move changed the
-deploy script and the verifier only where they read the Trade manifest: the Universal Router address and runtime hash
-are now pinned in `script/AgentDeployBase.sol` and in the agent manifests, and the preflight reproduces that hash from
-the pinned upstream router source. Baseline: Launch as pinned in `lib/mercuri-launch-contracts` at `99d7c28` and its
+Candidate: this repository after the repo-parity step. That step changed comments, NatSpec, import order and file
+locations in `src/` (`AgentTypes.sol` and `AgentPolicyLib.sol` moved to `src/libraries/`), never code: runtime and
+creation bytecode and the ABI of `AgentAccount`, `AgentAccountFactory` and `AgentPolicyRegistry` are byte-identical to
+the build at `bddc7c9`, and so to the reviewed build (with `bytecode_hash = "none"` the only CBOR is the compiler
+version). The evidence rows below are **pending final run after parity**; the move itself was checked at the initial
+commit `f11162d` (gate exit 0, byte-identical bytecode, Universal Router pin reproduced). The sources were moved from
+the Mercurifi Trade repository at `5f71ef5`, where the code candidate was `6a559b3` and the independent final review
+approved it for testnet; rebuilding here at `f11162d` gave creation and runtime code for `AgentAccount`,
+`AgentAccountFactory` and `AgentPolicyRegistry` byte-identical to the build at `5f71ef5`. The move changed the deploy
+script and the verifier only where they read the Trade manifest: the Universal Router address and runtime hash are now
+pinned in `script/AgentDeployBase.sol` and in the agent manifests, and the preflight reproduces that hash from the
+pinned upstream router source. Baseline: Launch as pinned in `lib/mercuri-launch-contracts` at `99d7c28` and its
 deployment records for 5042002 and 5042; the deployed Universal Router `0x4fcA…9Fb1` at its pinned runtime hash.
 Toolchain: forge 1.4.3, solc 0.8.26, Cancun, via-IR, 200 optimizer runs for `src/**`, no metadata hash. Missing
 evidence is pending, not pass.
 
 | Requirement | Baseline | Candidate | Command or artifact | Result | Open gap |
 | --- | --- | --- | --- | --- | --- |
-| Source manifest | n/a | All eight `src/` sources listed with sha256, identical to the reviewed sources | `python3 script/check-local-source.py` (in gate) | Pending final run after parity | None |
-| Bytecode identity after the move | Build at mercuri-trade-contracts `5f71ef5` | Build here at `f11162d` | `deployedBytecode` and `bytecode` of the three contracts compared, with and without the trailing CBOR | Byte-identical (runtime 15,387 / 3,855 / 17,838 B); immutable offsets identical | None |
+| Source manifest | n/a | All eight `src/` sources listed with sha256; they differ from the reviewed sources only in comments, NatSpec, import order and location (repo-parity step) | `python3 script/check-local-source.py` (in gate) | Pending final run after parity | None |
+| Bytecode identity after the move | Build in the Mercurifi Trade repository at `5f71ef5` | Build here at `f11162d` | `deployedBytecode` and `bytecode` of the three contracts compared, with and without the trailing CBOR | Byte-identical (runtime 15,387 / 3,855 / 17,838 B); immutable offsets identical | None |
+| Bytecode identity after the parity step | Build at `bddc7c9` | Build after the repo-parity commits | `deployedBytecode`, `bytecode` and ABI of the three contracts compared (`cmp`) after each commit that touched `src/` | Byte-identical; ABI JSON identical | None |
 | NatSpec | n/a | `AgentAccount`, `AgentAccountFactory`, `AgentPolicyRegistry` and their three interfaces | `python3 script/check-natspec.py` | Pending final run after parity | Semantic review of NatSpec is part of the independent review |
 | Runtime identity | n/a | Every immutable of the implementation (10), factory (14) and registry (1) reconstructed; a flipped byte in each is rejected by name; extra or missing immutables refused; EIP-1167 clone check | `python3 script/verify-agent-accounts.py --self-test`, ten `--self-test-flipped` pairs (in gate) | Pending final run after parity | Live comparison against a real deployment is pending until a testnet deployment exists |
 | Substitution correctness | n/a | Constructor simulations (`eth_call`, no transaction) of the built creation code with the testnet manifest inputs equal the reconstructed runtimes | `python3 script/verify-agent-accounts.py --simulate --block 66465327` against `https://rpc.testnet.arc.io` | Pending final run after parity | Mainnet simulation pending (no public mainnet RPC reachable) |

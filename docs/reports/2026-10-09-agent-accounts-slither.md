@@ -1,8 +1,8 @@
 # Agent accounts: Slither triage
 
-Code candidate `6a559b3db594fe34b2a10a4ca8ec196bba4905f1` (branch `feat/agent-accounts` of mercuri-trade-contracts,
-where these sources were developed); `src/` is identical at every later commit of the branch up to this report.
-Slither **0.11.3**, 100 detectors, run per target file by [`script/run-slither.sh`](../../script/run-slither.sh)
+Code candidate `6a559b3db594fe34b2a10a4ca8ec196bba4905f1` (branch `feat/agent-accounts` of the Mercurifi Trade
+repository, where these sources were developed); `src/` is identical at every later commit of the branch up to this
+report. Slither **0.11.3**, 100 detectors, run per target file by [`script/run-slither.sh`](../../script/run-slither.sh)
 (results in `lib/` filtered out). Whole-repository mode is not usable here: several dependencies declare a contract
 named `ERC20` and Slither stops with `Type not found contract ERC20`.
 
