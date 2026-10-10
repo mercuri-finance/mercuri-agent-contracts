@@ -1,10 +1,10 @@
 # Agent accounts: Slither triage
 
-Code candidate `6a559b3db594fe34b2a10a4ca8ec196bba4905f1` (branch `feat/agent-accounts`); `src/` is identical at every
-later commit of the branch up to this report. Slither **0.11.3**, 100 detectors, run per target file by
-[`script/run-slither.sh`](../../script/run-slither.sh) (results in `lib/` filtered out). Whole-repository mode is not
-usable here: several vendored dependencies declare a contract named `ERC20` and Slither stops with
-`Type not found contract ERC20`.
+Code candidate `6a559b3db594fe34b2a10a4ca8ec196bba4905f1` (branch `feat/agent-accounts` of mercuri-trade-contracts,
+where these sources were developed); `src/` is identical at every later commit of the branch up to this report.
+Slither **0.11.3**, 100 detectors, run per target file by [`script/run-slither.sh`](../../script/run-slither.sh)
+(results in `lib/` filtered out). Whole-repository mode is not usable here: several dependencies declare a contract
+named `ERC20` and Slither stops with `Type not found contract ERC20`.
 
 | Target | Contracts analysed | Results |
 | --- | --- | --- |
@@ -15,6 +15,8 @@ usable here: several vendored dependencies declare a contract named `ERC20` and 
 **Verdict: 87 results, 0 true positives.** No result calls for a code change. The script fails when the per-target,
 per-detector counts differ from this triage, so a new result must be triaged here before the evidence is updated.
 Matches the independent final review's ad hoc run of the same version at `c8c6485` (same 87 results, line for line).
+After the move the sources live directly under `src/`; the re-run in this repository is pending the final run after
+the repo-parity step.
 
 Classes used below: **FP** false positive (the pattern is not present or cannot be reached as described);
 **By design** the pattern is present and intended, with the reason; **Style** naming or complexity only.
