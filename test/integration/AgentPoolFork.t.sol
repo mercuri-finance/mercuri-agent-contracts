@@ -50,7 +50,7 @@ contract AgentPoolForkTest is Test {
         vm.createSelectFork(rpc, vm.envOr("AGENT_FORK_BLOCK", TESTNET_BLOCK));
         assertEq(block.chainid, chain);
         record = vm.readFile("lib/mercuri-launch-contracts/deployments/5042002.json");
-        manifest = vm.readFile("deployments/agent-accounts-manifest-5042002.json");
+        manifest = vm.readFile("deployments/manifest-5042002.json");
 
         // The production deploy script, simulated in memory against the deployed Launch contracts.
         AgentAccount impl;

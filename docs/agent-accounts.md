@@ -161,8 +161,8 @@ policy, the first agent and the usage slots into the registry. At Arc gas prices
 
 ## 9. Deployment
 
-Inputs only, per network: [`deployments/agent-accounts-manifest-5042002.json`](../deployments/agent-accounts-manifest-5042002.json)
-and [`deployments/agent-accounts-manifest-5042.json`](../deployments/agent-accounts-manifest-5042.json). Launch
+Inputs only, per network: [`deployments/manifest-5042002.json`](../deployments/manifest-5042002.json)
+and [`deployments/manifest-5042.json`](../deployments/manifest-5042.json). Launch
 addresses come from Launch's deployment record for the chain, the Universal Router and its runtime hash are the pins in
 [`script/AgentDeployBase.sol`](../script/AgentDeployBase.sol) (reproduced by the preflight from the pinned upstream
 router source and the bytes observed on chain, [`docs/reports/2026-09-27-universal-router-comparison.json`](reports/2026-09-27-universal-router-comparison.json)),
@@ -177,7 +177,7 @@ and getter matches the manifest (`EXPECTED_AGENT_FACTORY` optionally pins the fa
 own owner go per network (decision D9); no task runs it with `--broadcast`.
 
 After a broadcast, [`script/write-agent-accounts-record.py`](../script/write-agent-accounts-record.py) writes
-`deployments/agent-accounts-<chainId>.json` from forge's completed broadcast file, and only from that: no pending
+`deployments/<chainId>.json` from forge's completed broadcast file, and only from that: no pending
 transaction, exactly the implementation then the factory, both CREATEs from one sender at consecutive nonces with
 status-1 receipts, the broadcast's chain and commit matching, the constructor arguments equal to the manifest (the
 implementation naming the factory and the factory's first CREATE as registry), each input the built creation code with
@@ -187,7 +187,7 @@ written to a temporary file and hard-linked into place, which fails if the name 
 racing run is never replaced. Its `--self-test` (54 cases, in the gate) covers each refusal. No record exists: nothing
 has been deployed.
 
-Then `python3 script/verify-agent-accounts.py --rpc <Arc RPC> --block <n> --record deployments/agent-accounts-<chainId>.json`
+Then `python3 script/verify-agent-accounts.py --rpc <Arc RPC> --block <n> --record deployments/<chainId>.json`
 reads only that record (the writer's file name, key set and version, every input equal to the manifest), refuses a
 block before the record's `factoryDeployBlock` (where every runtime is empty), rebuilds the
 three runtimes from `out/` with the manifest and record values in every immutable and compares them byte for byte with
@@ -220,7 +220,7 @@ evidence is pending, not pass.
 | Universal Router pin | n/a | `out/universal-router` rebuilt from the pinned submodules (110-file closure, every keccak checked) is byte-identical to the build the router comparison report matched on chain; with the report's immutables it reproduces the observed runtime (sha256) on both networks, whose keccak is each manifest's `routerCodeHash` with the manifest permit2 in every PERMIT2 slot | `bash script/build-universal-router.sh`; `verify-agent-accounts.py --preflight` (in gate) | Pass | None |
 | Manifests | n/a | Inputs only (extra keys refused by the script and the preflight); Launch addresses = Launch records, admin = timelock, guardian = record guardian, router and hash = the pins and the reproduced router, ceilings = spec 4.5 | `verify-agent-accounts.py --preflight` for both; a raised-ceiling copy and a testnet copy with the mainnet router hash refused (in gate); `DeployAgentAccounts.t.sol` | Pending final run after parity | Mainnet guardian code check runs only at deploy time (script requires code on 5042) |
 | Deploy script | n/a | Predicts implementation, factory and registry from the deployer nonce; full wiring check; wrong chain and missing code refused; tampered manifests refused by field, including the other network's router hash | `test/local/DeployAgentAccounts.t.sol` (6 tests, in process against the fixture, never broadcast); the fork test runs `run()` against deployed testnet Launch; `forge script script/DeployAgentAccounts.s.sol --rpc-url https://rpc.testnet.arc.io` (no `--broadcast`, sender `0x…0a6e47`) | Pending final run after parity | Testnet deployment needs an owner go (D9) |
-| Deployment record writer | n/a | `write-agent-accounts-record.py`: writes `agent-accounts-<chainId>.json` only from a completed broadcast and only for a manifest that passes the preflight; links the record into place so an existing or racing record is never overwritten; names only HEAD of a clean tree as `sourceRevision`; the verifier's live mode reads only that record and refuses a block before `factoryDeployBlock` | `python3 script/write-agent-accounts-record.py --self-test` (in gate) and the verifier's record self-test | Pending final run after parity | Run against the real broadcast at the testnet deployment |
+| Deployment record writer | n/a | `write-agent-accounts-record.py`: writes `<chainId>.json` only from a completed broadcast and only for a manifest that passes the preflight; links the record into place so an existing or racing record is never overwritten; names only HEAD of a clean tree as `sourceRevision`; the verifier's live mode reads only that record and refuses a block before `factoryDeployBlock` | `python3 script/write-agent-accounts-record.py --self-test` (in gate) and the verifier's record self-test | Pending final run after parity | Run against the real broadcast at the testnet deployment |
 | Behaviour, attack, fuzz, invariant tests | n/a | 213 agent tests | `bash script/check-contracts.sh` (seed `0x5042`) | Pending final run after parity | None |
 | Stress | n/a | Gate with `--stress`: 10,000-run fuzz pass (fork suite included), then the agent invariants alone at 1,024 x 256 with their own counterexample directory | `ARC_LOCAL_FORK_RPC=https://rpc.testnet.arc.io AGENT_FORK_CHAIN_ID=5042002 AGENT_INVARIANT_STATS=true bash script/check-contracts.sh --stress` | Pending final run after parity | None |
 | Pinned fork | n/a | Agent pool buy and sell (ERC-20 and Permit2 allowances back to zero; Alchemy URLs refused) through the deployed testnet Universal Router and LaunchHook on graduated token `0x97B4…eE84` at block 65,301,435, account deployed by the production script | `ARC_LOCAL_FORK_RPC=https://rpc.testnet.arc.io forge test --match-contract AgentPoolForkTest` (skipped without `ARC_LOCAL_FORK_RPC`) | Pending final run after parity | Spec 10's other fork cases and a mainnet fork: see "Before testnet sign-off" below |

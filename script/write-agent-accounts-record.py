@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Writes the agent accounts deployment record `agent-accounts-<chainId>.json` from a completed forge broadcast of
+"""Writes the agent accounts deployment record `<chainId>.json` from a completed forge broadcast of
 script/DeployAgentAccounts.s.sol. No keys, no network.
 
 The record has the shape of Launch's deployment records (one flat JSON object, sorted keys, two-space indent, chain id
@@ -24,7 +24,7 @@ nothing is written. A dry run (`dry-run/`, no receipts) is refused. The manifest
                                                 [--source-revision SHA [--allow-unverified-revision]]
   python3 script/write-agent-accounts-record.py --self-test
 
-It never overwrites a record: archive the current one first (as `archive/agent-accounts-<chainId>-<deployBlock>.json`).
+It never overwrites a record: archive the current one first (as `archive/<chainId>-<deployBlock>.json`).
 The record is written to a temporary file and hard-linked into place, which fails if the name exists, so even a record
 written by a racing run between the check and the write is never replaced.
 The record names the source revision: HEAD of a tree whose src/, script/, deployments/ and foundry.toml have no
@@ -342,9 +342,9 @@ def write(args):
     revision = source_revision(args)
     record = build(args, manifest, revision)
     out_dir = Path(args.out_dir).resolve()
-    target = out_dir / f'agent-accounts-{record["chainId"]}.json'
+    target = out_dir / f'{record["chainId"]}.json'
     if target.exists():
-        raise Refused(f'{target} exists; archive it as archive/agent-accounts-{record["chainId"]}-<deployBlock>.json '
+        raise Refused(f'{target} exists; archive it as archive/{record["chainId"]}-<deployBlock>.json '
                       f'first')
     out_dir.mkdir(parents=True, exist_ok=True)
     publish(json.dumps(record, indent=2, sort_keys=True) + '\n', target)
@@ -357,7 +357,7 @@ def write(args):
 
 def selftest():
     revision = 'b794a9c' + '0' * 33
-    manifest = json.loads((root / 'deployments/agent-accounts-manifest-5042002.json').read_text())
+    manifest = json.loads((root / 'deployments/manifest-5042002.json').read_text())
     sender = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
     nonce = 7
     implementation = create_address(sender, nonce)
@@ -431,14 +431,14 @@ def selftest():
             out = d / 'out'
             if existing:
                 out.mkdir()
-                (out / 'agent-accounts-5042002.json').write_text('{}\n')
+                (out / '5042002.json').write_text('{}\n')
             argv = [sys.executable, __file__, '--broadcast', str(path), '--manifest', str(d / 'manifest.json'),
                     '--out-dir', str(out), '--source-revision', rev]
             if override:
                 argv.append('--allow-unverified-revision')
             result = subprocess.run(argv, capture_output=True, text=True)
             text = result.stdout + result.stderr
-            written = out / 'agent-accounts-5042002.json'
+            written = out / '5042002.json'
             record = json.loads(written.read_text()) if written.exists() and not existing else None
             ok = (result.returncode == 0) == expect_ok and all(m in text for m in must)
             ok &= (record is not None) if expect_ok else (record is None)
@@ -501,7 +501,7 @@ def selftest():
          must=['not the built AgentPolicyRegistry'])
     case('factory block before implementation block', bc(fac_receipt={'blockNumber': hex(99)}), False,
          must=['precedes'])
-    mainnet = json.loads((root / 'deployments/agent-accounts-manifest-5042.json').read_text())
+    mainnet = json.loads((root / 'deployments/manifest-5042.json').read_text())
     case('manifest of another chain', good, False, must=['chain 5042002, not 5042'], man=mainnet)
     case('existing record is never overwritten', good, False, must=['exists'], existing=True)
     case('manifest with an extra key', good, False, must=['fails the preflight', 'manifest keys differ'],
@@ -570,7 +570,7 @@ def selftest():
 
     # A racing run creates the record after the existence check: the link refuses and the racing file survives.
     with tempfile.TemporaryDirectory() as d:
-        target = Path(d) / 'agent-accounts-5042002.json'
+        target = Path(d) / '5042002.json'
         target.write_text('{"racing": true}\n')
         try:
             publish('{"ours": true}\n', target)
@@ -598,10 +598,10 @@ def selftest():
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Write deployments/agent-accounts-<chainId>.json from a completed '
+    parser = argparse.ArgumentParser(description='Write deployments/<chainId>.json from a completed '
                                                  'forge broadcast of DeployAgentAccounts.')
     parser.add_argument('--broadcast', help="forge's run-latest.json (or run-*.json) of DeployAgentAccounts")
-    parser.add_argument('--manifest', default=str(root / 'deployments/agent-accounts-manifest-5042002.json'))
+    parser.add_argument('--manifest', default=str(root / 'deployments/manifest-5042002.json'))
     parser.add_argument('--out-dir', default=str(root / 'deployments'))
     parser.add_argument('--source-revision', help='full commit SHA; must be HEAD of a clean tree (the default)')
     parser.add_argument('--allow-unverified-revision', action='store_true',

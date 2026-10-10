@@ -9,7 +9,7 @@ import {AgentPolicyRegistry} from "../src/AgentPolicyRegistry.sol";
 import {Policy} from "../src/libraries/AgentTypes.sol";
 
 /// @notice Deploys the Mercurifi agent account implementation and its factory (which deploys the policy registry) from
-///         `deployments/agent-accounts-manifest-<chainId>.json`. Contains no key: pass `--account` or `--ledger`.
+///         `deployments/manifest-<chainId>.json`. Contains no key: pass `--account` or `--ledger`.
 ///         Every network deployment needs its own owner go (spec D9); no task runs this with `--broadcast`.
 /// @dev The manifest holds inputs only. Its Launch addresses must equal Launch's deployment record for the chain, its
 ///      admin must be the record's timelock and its guardian the record's guardian (the Guardian Safe on mainnet, which
@@ -22,8 +22,8 @@ import {Policy} from "../src/libraries/AgentTypes.sol";
 ///      check sends nothing. A stray deployer transaction in between moves the factory; the factory constructor then
 ///      reverts `ImplementationMismatch`.
 contract DeployAgentAccounts is AgentDeployBase {
-    /// @dev Each network's agent manifest is `deployments/agent-accounts-manifest-<chainId>.json`.
-    string internal constant AGENT_MANIFEST_PREFIX = "deployments/agent-accounts-manifest-";
+    /// @dev Each network's agent manifest is `deployments/manifest-<chainId>.json`.
+    string internal constant AGENT_MANIFEST_PREFIX = "deployments/manifest-";
 
     /// @dev The factory's constructor arguments and the implementation's dependencies, in manifest terms.
     struct Inputs {

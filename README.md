@@ -24,7 +24,7 @@ pause powers, migration, gas and release evidence are in [`docs/agent-accounts.m
 | `src/` | The three deployed contracts, `AgentPolicyLib`, `AgentTypes` and the interfaces; sha256 pinned in `source-manifest.json` |
 | `test/` | Behaviour, attack, fuzz, invariant, gas, deploy-script and pinned-fork tests; `test/utils/` holds the Launch and Uniswap v4 fixture |
 | `script/` | `DeployAgentAccounts.s.sol` (never run with `--broadcast` without an owner go), the record writer, the runtime verifier, the gate, Slither, the Universal Router build, and `local/` (loopback Anvil deployment for SDK tests) |
-| `deployments/` | Per-network inputs (`agent-accounts-manifest-<chainId>.json`); no deployment record exists yet |
+| `deployments/` | Per-network inputs (`manifest-<chainId>.json`); no deployment record exists yet |
 | `docs/` | Contract documentation and reports |
 | `lib/` | Git submodules (below) |
 

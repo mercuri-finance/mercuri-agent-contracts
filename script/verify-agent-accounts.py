@@ -15,7 +15,7 @@ runtime_identity.py.
   python3 script/verify-agent-accounts.py --simulate [--rpc URL] [--block N] [--manifest FILE]
                                        # read-only: eth_call constructor simulations equal the reconstruction
   python3 script/verify-agent-accounts.py --rpc URL --block N --record FILE [--account ADDR] [--manifest FILE]
-                                       # FILE: deployments/agent-accounts-<chainId>.json, written only by
+                                       # FILE: deployments/<chainId>.json, written only by
                                        # write-agent-accounts-record.py from a completed broadcast; N must be at
                                        # or after the record's factoryDeployBlock
 
@@ -218,7 +218,7 @@ def run_preflight(manifest, label='manifest'):
 
 def self_test_kind(kind, flip=None, manifest=None):
     """The built runtime with the testnet manifest's values; with `flip`, one byte of that immutable flipped."""
-    manifest = manifest or rid.load('deployments/agent-accounts-manifest-5042002.json')
+    manifest = manifest or rid.load('deployments/manifest-5042002.json')
     artifact = rid.load(ARTIFACTS[kind])
     values = expected_values(kind, manifest, SELF_TEST)
     live, ranges = rid.expected_runtime(artifact, values, kind)
@@ -234,7 +234,7 @@ def self_test_kind(kind, flip=None, manifest=None):
 
 def immutable_set_self_test():
     """An extra or a missing immutable in any of the three artifacts must be refused."""
-    manifest = rid.load('deployments/agent-accounts-manifest-5042002.json')
+    manifest = rid.load('deployments/manifest-5042002.json')
     ok = True
     for kind, path in ARTIFACTS.items():
         artifact = rid.load(path)
@@ -255,7 +255,7 @@ def preflight_self_test():
     """Both shipped manifests pass; every tampered input is refused."""
     ok = True
     for chain in (5042002, 5042):
-        manifest = rid.load(f'deployments/agent-accounts-manifest-{chain}.json')
+        manifest = rid.load(f'deployments/manifest-{chain}.json')
         ok &= run_preflight(manifest, f'shipped {chain}')
         tampers = {f'{key} changed': (key, '0x' + '0' * 38 + 'ee') for key in RECORD_KEYS}
         tampers['universalRouter changed'] = ('universalRouter', '0x' + '0' * 38 + 'ee')
@@ -389,8 +389,8 @@ def load_record(path, manifest):
     """The deployment record written by write-agent-accounts-record.py, and only that: the file name, the exact key set,
     the version and every input must agree with the manifest, so a hand-written or stale record is refused."""
     path = Path(path)
-    if path.name != f'agent-accounts-{manifest["chainId"]}.json':
-        raise SystemExit(f'{path.name} is not agent-accounts-{manifest["chainId"]}.json, the record the writer emits')
+    if path.name != f'{manifest["chainId"]}.json':
+        raise SystemExit(f'{path.name} is not {manifest["chainId"]}.json, the record the writer emits')
     record = json.loads(path.read_text())
     if set(record) != war.RECORD_KEYS:
         raise SystemExit(f'record keys differ from the writer\'s: unexpected {sorted(set(record) - war.RECORD_KEYS)}, '
@@ -413,19 +413,19 @@ def load_record(path, manifest):
 
 def record_self_test():
     """A record shaped as the writer emits it is accepted; a renamed, extended or tampered one is refused."""
-    manifest = rid.load('deployments/agent-accounts-manifest-5042002.json')
+    manifest = rid.load('deployments/manifest-5042002.json')
     record = {key: manifest[key] for key in war.ACCOUNT_INPUTS + ('admin', 'guardian', 'ceilings')}
     record.update(chainId=5042002, implementation=SELF_TEST['implementation'], factory=SELF_TEST['factory'],
                   registry=SELF_TEST['registry'], deployer=SELF_TEST['implementation'], deployBlock=1,
                   factoryDeployBlock=1, version=war.VERSION, sourceRevision='0' * 40)
     variants = {
-        'writer-shaped record': (record, 'agent-accounts-5042002.json', True),
+        'writer-shaped record': (record, '5042002.json', True),
         'other file name': (record, 'deployment.json', False),
-        'extra key': (dict(record, filler=SELF_TEST['factory']), 'agent-accounts-5042002.json', False),
-        'admin differs': (dict(record, admin=SELF_TEST['factory']), 'agent-accounts-5042002.json', False),
+        'extra key': (dict(record, filler=SELF_TEST['factory']), '5042002.json', False),
+        'admin differs': (dict(record, admin=SELF_TEST['factory']), '5042002.json', False),
         'ceilings differ': (dict(record, ceilings=dict(record['ceilings'], maxTradeUsdc=1)),
-                            'agent-accounts-5042002.json', False),
-        'other version': (dict(record, version='0'), 'agent-accounts-5042002.json', False),
+                            '5042002.json', False),
+        'other version': (dict(record, version='0'), '5042002.json', False),
     }
     ok = True
     with tempfile.TemporaryDirectory() as d:
@@ -441,10 +441,10 @@ def record_self_test():
             ok &= accepted == accept
             path.unlink()
         # live() refuses a block before the factory existed, before any RPC call (the URL here is never reached).
-        path = Path(d) / 'agent-accounts-5042002.json'
+        path = Path(d) / '5042002.json'
         path.write_text(json.dumps(dict(record, deployBlock=99, factoryDeployBlock=100)))
         for block, accept in ((99, False), (100, True)):
-            args = argparse.Namespace(manifest='deployments/agent-accounts-manifest-5042002.json', record=str(path),
+            args = argparse.Namespace(manifest='deployments/manifest-5042002.json', record=str(path),
                                       block=block, rpc='http://127.0.0.1:9/never-called', account=None)
             try:
                 live(args)
@@ -514,9 +514,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--rpc', default=DEFAULT_RPC)
     parser.add_argument('--block', type=int)
-    parser.add_argument('--record', help='deployments/agent-accounts-<chainId>.json from write-agent-accounts-record.py')
+    parser.add_argument('--record', help='deployments/<chainId>.json from write-agent-accounts-record.py')
     parser.add_argument('--account', help='also check one account clone')
-    parser.add_argument('--manifest', default='deployments/agent-accounts-manifest-5042002.json')
+    parser.add_argument('--manifest', default='deployments/manifest-5042002.json')
     parser.add_argument('--preflight', action='store_true', help='offline: manifest against records and spec')
     parser.add_argument('--self-test', action='store_true', help='offline: every check must behave as required')
     parser.add_argument('--simulate', action='store_true',

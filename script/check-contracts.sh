@@ -28,21 +28,21 @@ python3 script/write-agent-accounts-record.py --self-test
 # Both manifests must agree with Launch's records, the reproduced Universal Router and the spec 4.5 beta ceilings, and
 # a copy of the mainnet manifest with one ceiling raised must be refused.
 python3 script/verify-agent-accounts.py --preflight
-python3 script/verify-agent-accounts.py --preflight --manifest deployments/agent-accounts-manifest-5042.json
+python3 script/verify-agent-accounts.py --preflight --manifest deployments/manifest-5042.json
 pending_dir=$(mktemp -d)
 trap 'rm -rf "$pending_dir"' EXIT
 python3 -c 'import json, sys; m = json.load(open(sys.argv[1])); m["ceilings"]["maxTradeUsdc"] += 1; json.dump(m, open(sys.argv[2], "w"))' \
-  deployments/agent-accounts-manifest-5042.json "$pending_dir/agent-accounts-manifest-5042.json"
-if raised=$(python3 script/verify-agent-accounts.py --preflight --manifest "$pending_dir/agent-accounts-manifest-5042.json" 2>&1); then
+  deployments/manifest-5042.json "$pending_dir/manifest-5042.json"
+if raised=$(python3 script/verify-agent-accounts.py --preflight --manifest "$pending_dir/manifest-5042.json" 2>&1); then
   echo 'verify-agent-accounts.py --preflight accepted a manifest with a ceiling above spec 4.5' >&2
   exit 1
 fi
 grep -q 'ceilings.maxTradeUsdc .* != spec 4.5 beta ceiling' <<<"$raised" || { echo "raised-ceiling preflight failed without its report: $raised" >&2; exit 1; }
 # A copy of the testnet manifest naming the mainnet router runtime hash must be refused against the reproduced router.
 python3 -c 'import json, sys; m = json.load(open(sys.argv[1])); m["routerCodeHash"] = json.load(open(sys.argv[2]))["routerCodeHash"]; json.dump(m, open(sys.argv[3], "w"))' \
-  deployments/agent-accounts-manifest-5042002.json deployments/agent-accounts-manifest-5042.json \
-  "$pending_dir/agent-accounts-manifest-5042002.json"
-if swapped=$(python3 script/verify-agent-accounts.py --preflight --manifest "$pending_dir/agent-accounts-manifest-5042002.json" 2>&1); then
+  deployments/manifest-5042002.json deployments/manifest-5042.json \
+  "$pending_dir/manifest-5042002.json"
+if swapped=$(python3 script/verify-agent-accounts.py --preflight --manifest "$pending_dir/manifest-5042002.json" 2>&1); then
   echo 'verify-agent-accounts.py --preflight accepted a manifest with the other network'"'"'s router hash' >&2
   exit 1
 fi

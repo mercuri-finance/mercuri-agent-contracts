@@ -74,7 +74,7 @@ contract DeployAgentAccountsTest is AgentFixture {
     }
 
     function _files(uint256 chain) internal view returns (string memory m, string memory rec) {
-        m = vm.readFile(string.concat("deployments/agent-accounts-manifest-", vm.toString(chain), ".json"));
+        m = vm.readFile(string.concat("deployments/manifest-", vm.toString(chain), ".json"));
         rec = vm.readFile(string.concat("lib/mercuri-launch-contracts/deployments/", vm.toString(chain), ".json"));
     }
 
