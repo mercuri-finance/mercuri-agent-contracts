@@ -76,7 +76,7 @@ library AgentPolicyLib {
     ///      exactly when `isNarrowing(current, next)`.
     /// @param current Policy in force (amounts usdc6).
     /// @param next Proposed policy (amounts usdc6).
-    /// @return The policy to apply now (amounts usdc6).
+    /// @return Policy to apply now (amounts usdc6).
     function tighten(Policy memory current, Policy memory next) internal pure returns (Policy memory) {
         uint256[11] memory c = words(current);
         uint256[11] memory n = words(next);
@@ -94,8 +94,8 @@ library AgentPolicyLib {
     /// @param current Policy in force (amounts usdc6).
     /// @param target Policy the owner asked for (amounts usdc6).
     /// @param lastWrite Write sequence number of each field's last change, in `Policy` struct order.
-    /// @param seq The account's write sequence number when the change was queued.
-    /// @return The merged policy (amounts usdc6).
+    /// @param seq Account's write sequence number when the change was queued.
+    /// @return Merged policy (amounts usdc6).
     function merge(Policy memory current, Policy memory target, uint64[11] memory lastWrite, uint64 seq)
         internal
         pure
@@ -152,6 +152,14 @@ library AgentPolicyLib {
         return Math.mulDiv(ratio - 1e18, MAX_BPS, 1e18, Math.Rounding.Ceil);
     }
 
+    /// @notice A policy as its 11 ABI words, one per field in `Policy` struct order (a static struct encodes field
+    ///         by field; `allowlistOnly` is 0 or 1).
+    /// @param p Policy.
+    /// @return Field values.
+    function words(Policy memory p) internal pure returns (uint256[11] memory) {
+        return abi.decode(abi.encode(p), (uint256[11]));
+    }
+
     /// @dev Per-field narrowing rule. `minTokenAgeBlocks` is a floor, so higher is tighter; for `allowlistOnly`
     ///      (0 or 1) `next >= current` is `next || !current`; every other field is tighter when lower or equal.
     /// @param field Field index in `Policy` struct order.
@@ -162,17 +170,9 @@ library AgentPolicyLib {
         return field == F_MIN_TOKEN_AGE_BLOCKS || field == F_ALLOWLIST_ONLY ? next >= current : next <= current;
     }
 
-    /// @notice A policy as its 11 ABI words, one per field in `Policy` struct order (a static struct encodes field
-    ///         by field; `allowlistOnly` is 0 or 1).
-    /// @param p The policy.
-    /// @return The field values.
-    function words(Policy memory p) internal pure returns (uint256[11] memory) {
-        return abi.decode(abi.encode(p), (uint256[11]));
-    }
-
     /// @dev Inverse of `words`; every word comes from a field of the same type, so the decode cannot fail.
-    /// @param w The field values.
-    /// @return The policy.
+    /// @param w Field values.
+    /// @return Policy.
     function _fromWords(uint256[11] memory w) private pure returns (Policy memory) {
         return abi.decode(abi.encode(w), (Policy));
     }

@@ -15,14 +15,14 @@ import {LaunchRequest} from "../AgentTypes.sol";
 ///         factory's `AgentPolicyRegistry`, where the owner manages it.
 interface IAgentAccount is IERC1271 {
     /// @notice Assets left the account to the owner.
-    /// @param token The token, or zero for native USDC.
+    /// @param token Token, or zero for native USDC.
     /// @param amount Amount sent: native wei (18 decimals) for zero, else the token's own units.
     event AccountWithdrawn(address indexed token, uint256 amount);
     /// @notice An agent acted through the account. The authoritative attribution record: the log's address is the
     ///         account.
-    /// @param agent The agent key that sent the transaction.
+    /// @param agent Agent key that sent the transaction.
     /// @param action `ACTION_*` id.
-    /// @param token The Launch token traded, launched or swept; zero for a claim or a native sweep.
+    /// @param token Launch token traded, launched or swept; zero for a claim or a native sweep.
     /// @param usdcSpent USDC that left the account, usdc6: the native balance delta rounded up (refunds netted;
     ///        a launch includes its fee). Zero for a claim or sweep.
     /// @param usdcReceived USDC that entered the account, usdc6: the native balance delta rounded down.
@@ -63,10 +63,10 @@ interface IAgentAccount is IERC1271 {
     /// @notice The curve is younger than `minTokenAgeBlocks`.
     error TokenTooNew();
     /// @notice The curve's snipe tax is above `maxSnipeBps`.
-    /// @param current The current snipe tax, basis points.
+    /// @param current Current snipe tax, basis points.
     error SnipeTaxTooHigh(uint256 current);
     /// @notice The trade's own price impact is above `maxPriceImpactBps`.
-    /// @param bps The quoted impact, basis points, rounded up.
+    /// @param bps Quoted impact, basis points, rounded up.
     error PriceImpactTooHigh(uint256 bps);
     /// @notice The agent's minimum output is zero.
     error ZeroMinOut();
@@ -93,49 +93,49 @@ interface IAgentAccount is IERC1271 {
 
     /// @notice Binds the referrer of a fresh clone. The registry already holds its owner, policy and agents.
     /// @dev Callable only by `FACTORY`, once, inside `createAccount`. Binds a non-zero referrer in the FeeManager.
-    /// @param referrer_ The referrer, or zero for none; never the account itself.
+    /// @param referrer_ Referrer, or zero for none; never the account itself.
     function initialize(address referrer_) external;
 
     /// @notice Factory that alone may initialise accounts of this implementation.
-    /// @return The AgentAccountFactory address.
+    /// @return AgentAccountFactory address.
     function FACTORY() external view returns (address);
     /// @notice Registry holding this account's owner, policy, agents, queue and usage.
-    /// @return The AgentPolicyRegistry of `FACTORY`.
+    /// @return AgentPolicyRegistry of `FACTORY`.
     function REGISTRY() external view returns (IAgentPolicyRegistry);
     /// @notice Launch factory whose `curveOf` registry decides which curves are genuine.
-    /// @return The LaunchFactory proxy.
+    /// @return LaunchFactory proxy.
     function LAUNCH_FACTORY() external view returns (ILaunchFactory);
     /// @notice Launch FeeManager that holds the referrer binding and the account's creator fees.
-    /// @return The FeeManager proxy.
+    /// @return FeeManager proxy.
     function FEE_MANAGER() external view returns (IFeeManager);
     /// @notice Launch GraduationManager that names each graduated token's pool.
-    /// @return The GraduationManager proxy.
+    /// @return GraduationManager proxy.
     function GRADUATION_MANAGER() external view returns (IGraduationManager);
     /// @notice The only hook a pool swap may go through.
-    /// @return The LaunchHook address.
+    /// @return LaunchHook address.
     function LAUNCH_HOOK() external view returns (address);
     /// @notice Uniswap v4 PoolManager of graduated pools.
-    /// @return The PoolManager address.
+    /// @return PoolManager address.
     function POOL_MANAGER() external view returns (IPoolManager);
     /// @notice Universal Router used for pool swaps.
-    /// @return The router address.
+    /// @return Router address.
     function UNIVERSAL_ROUTER() external view returns (address);
     /// @notice Permit2 used to approve the router for one swap at a time.
-    /// @return The Permit2 address.
+    /// @return Permit2 address.
     function PERMIT2() external view returns (address);
     /// @notice Arc's native USDC, whose ERC-20 view has 6 decimals.
-    /// @return The USDC address.
+    /// @return USDC address.
     function USDC() external view returns (address);
 
     /// @notice The account's owner, read from the registry; the only recipient of withdrawals.
-    /// @return The owner address; zero on the implementation.
+    /// @return Owner address; zero on the implementation.
     function owner() external view returns (address);
     /// @notice The referrer bound in the FeeManager at creation, fixed for life.
-    /// @return The referrer, or zero for none.
+    /// @return Referrer, or zero for none.
     function referrer() external view returns (address);
     /// @notice The account's recorded cost basis in `token`. Only tokens the account bought are recorded; an owner
     ///         withdrawal cuts the recording pro rata, so tokens that come back later are unrecorded.
-    /// @param token The token.
+    /// @param token Token.
     /// @return costUsdc USDC paid for the recorded tokens, usdc6.
     /// @return tokens Recorded tokens, 18-decimal units.
     /// @return highWater Highest average cost of the open position after any buy, usdc6 per token unit times 1e36;
@@ -150,7 +150,7 @@ interface IAgentAccount is IERC1271 {
     ///      is netted), checked after the call against `maxTradeUsdc` here and the period and per-token caps in the
     ///      registry's `record`, so any breach reverts the whole call. A buy that sells the curve out graduates it
     ///      inline and needs about 2.5M gas.
-    /// @param token The Launch token.
+    /// @param token Launch token.
     /// @param usdcIn USDC to offer, usdc6.
     /// @param minTokensOut Minimum tokens, 18-decimal units; not zero.
     /// @param deadline Latest Unix time (seconds), within `maxDeadlineSeconds` of now.
@@ -171,7 +171,7 @@ interface IAgentAccount is IERC1271 {
     ///      `periodSellCap` in the registry. Proceeds (native delta rounded down to usdc6) never create headroom.
     ///      The allowance granted to the curve must be zero afterwards. The allowlist does not apply to sells.
     ///      `minUsdcOut` above `type(uint256).max / 1e12` reverts `AmountTooLarge`.
-    /// @param token The Launch token.
+    /// @param token Launch token.
     /// @param tokensIn Tokens to sell, 18-decimal units.
     /// @param minUsdcOut Minimum proceeds, usdc6; not zero.
     /// @param deadline Latest Unix time (seconds), within `maxDeadlineSeconds` of now.
@@ -183,18 +183,18 @@ interface IAgentAccount is IERC1271 {
     /// @notice Swaps exactly `amountIn` through the token's graduated Launch pool on the Universal Router, within the
     ///         policy's caps. Agent only (`P_POOL_SWAP`).
     /// @dev Lock, then `authorize`; then registration, phase `Graduated` (`NotGraduated`), `amountIn > 0`
-    ///      (`ZeroAmount`), `minAmountOut > 0` (`ZeroMinOut`) and both at most `type(uint128).max`
-    ///      (`AmountTooLarge`). The pool key is always `GraduationManager.poolKey(token)`, asserted to use `LAUNCH_HOOK`
-    ///      and to pair the token with USDC (`UnexpectedPool`); the agent cannot name a pool. The account approves
-    ///      Permit2 for exactly `amountIn` of the input and Permit2 the router for `uint160(amountIn)` expiring this
-    ///      block, then calls `execute(0x10, [actions 0x06 0x0c 0x0f], deadline)` (V4_SWAP with the allow-revert bit
-    ///      clear: SWAP_EXACT_IN_SINGLE with `minHopPriceX36 = 0` and `hookData = abi.encode(address(this))` so the
-    ///      LaunchHook attributes the fee to the account, SETTLE_ALL capped at `amountIn`, TAKE_ALL at least
-    ///      `minAmountOut`). Afterwards both allowances must be zero (`AllowanceNotCleared`), the input taken must be
-    ///      at most `amountIn` and the output at least `minAmountOut` (`UnexpectedSwapDelta`), and the pool price move
-    ///      `(hi / lo)^2 - 1` in basis points, rounded up, at most `maxPriceImpactBps`, where `hi` and `lo` are the
-    ///      larger and smaller `sqrtPriceX96` of before and after, so either token ordering reads the same. That
-    ///      limits the size of this swap only, not a price moved earlier.
+    ///      (`ZeroAmount`), `minAmountOut > 0` (`ZeroMinOut`) and both at most `type(uint128).max` (`AmountTooLarge`).
+    ///      The pool key is always `GraduationManager.poolKey(token)`, asserted to use `LAUNCH_HOOK` and to pair the
+    ///      token with USDC (`UnexpectedPool`); the agent cannot name a pool. The account approves Permit2 for exactly
+    ///      `amountIn` of the input and Permit2 the router for `uint160(amountIn)` expiring this block, then calls
+    ///      `execute(0x10, [actions 0x06 0x0c 0x0f], deadline)` (V4_SWAP with the allow-revert bit clear:
+    ///      SWAP_EXACT_IN_SINGLE with `minHopPriceX36 = 0` and `hookData = abi.encode(address(this))` so the LaunchHook
+    ///      attributes the fee to the account, SETTLE_ALL capped at `amountIn`, TAKE_ALL at least `minAmountOut`).
+    ///      Afterwards both allowances must be zero (`AllowanceNotCleared`), the input taken must be at most `amountIn`
+    ///      and the output at least `minAmountOut` (`UnexpectedSwapDelta`), and the pool price move `(hi / lo)^2 - 1`
+    ///      in basis points, rounded up, at most `maxPriceImpactBps`, where `hi` and `lo` are the larger and smaller
+    ///      `sqrtPriceX96` of before and after, so either token ordering reads the same. That limits the size of this
+    ///      swap only, not a price moved earlier.
     ///      Buy (`buyToken`): `amountIn` is usdc6, the allowlist applies and `amountIn <= maxTradeUsdc`. The spend is
     ///      the native balance delta rounded up to usdc6 (Arc's USDC ERC-20 view moves the native balance), charged to
     ///      the period and per-token caps and added to the basis with the measured token delta.
@@ -203,7 +203,7 @@ interface IAgentAccount is IERC1271 {
     ///      recorded amount are valued at their pro-rata share of the measured proceeds, rounded up. That share is a
     ///      weaker bound than a quote taken before the swap: it is what a moved pool actually paid. Proceeds (native
     ///      delta rounded down) never create headroom. Never sized from `minAmountOut`.
-    /// @param token The Launch token of the pool.
+    /// @param token Launch token of the pool.
     /// @param buyToken True to buy the token with USDC, false to sell it for USDC.
     /// @param amountIn Exact input: usdc6 on a buy, 18-decimal tokens on a sell.
     /// @param minAmountOut Minimum output: 18-decimal tokens on a buy, usdc6 on a sell; not zero.
@@ -217,18 +217,18 @@ interface IAgentAccount is IERC1271 {
     ///         account, within the policy's caps. Agent only (`P_LAUNCH`).
     /// @dev Lock, then the registry's `authorize` with `r.deadline`, which must lie in `[now, now +
     ///      maxDeadlineSeconds]` like a trade's, so a held or replayed launch expires, and which reverts `LaunchLimit`
-    ///      when the period's `launchesPerPeriod` is used up, before any external call. Calls `LaunchFactory.createToken`
-    ///      with `creator = address(this)`, `referrer` = the account's stored referrer and `value = launchFee +
-    ///      initialBuyUsdc * 1e12`, `launchFee` read from `LaunchFactory.config()`. The factory reverts
-    ///      `ConfigChanged` unless `expectedConfigHash` matches, so the fee paid is the fee quoted. The spend is the
-    ///      measured native balance delta rounded up to usdc6 (fee included); `ceil(launchFee / 1e12) +
+    ///      when the period's `launchesPerPeriod` is used up, before any external call. Calls
+    ///      `LaunchFactory.createToken` with `creator = address(this)`, `referrer` = the account's stored referrer and
+    ///      `value = launchFee + initialBuyUsdc * 1e12`, `launchFee` read from `LaunchFactory.config()`. The factory
+    ///      reverts `ConfigChanged` unless `expectedConfigHash` matches, so the fee paid is the fee quoted. The spend
+    ///      is the measured native balance delta rounded up to usdc6 (fee included); `ceil(launchFee / 1e12) +
     ///      initialBuyUsdc` and the measured spend must be at most `maxTradeUsdc`, and the spend counts toward the
     ///      period spend cap, the new token's per-token cap and `launchesPerPeriod` in the registry's `record`. The
-    ///      initial-buy tokens are recorded in the basis at cost `spent - ceil(launchFee / 1e12)` (never negative)
-    ///      and raise the high-water like a buy. `allowlistOnly` governs buys of existing tokens and does not apply here,
+    ///      initial-buy tokens are recorded in the basis at cost `spent - ceil(launchFee / 1e12)` (never negative) and
+    ///      raise the high-water like a buy. `allowlistOnly` governs buys of existing tokens and does not apply here,
     ///      nor do the token age and snipe limits; an owner who wants no agent launches withholds `P_LAUNCH`.
-    /// @param r The launch request; amounts usdc6 and 18-decimal tokens.
-    /// @return token The new token.
+    /// @param r Launch request; amounts usdc6 and 18-decimal tokens.
+    /// @return token New token.
     /// @return curve Its bonding curve.
     function launch(LaunchRequest calldata r) external returns (address token, address curve);
     /// @notice Claims the account's creator and referral fees from the FeeManager into the account. Agent only
@@ -246,7 +246,7 @@ interface IAgentAccount is IERC1271 {
     ///      A non-zero `token` must have a Launch curve (`TokenNotRegistered`), and its recorded basis is cut pro rata
     ///      exactly as an owner `withdraw`. Emits `AccountWithdrawn` and `AgentAction` with `tokenDelta = -amount`
     ///      (native wei when `token` is zero). No spend or sell cap is charged. Reverts `ZeroAmount` for zero.
-    /// @param token A registered Launch token, or zero for native USDC.
+    /// @param token Registered Launch token, or zero for native USDC.
     /// @param amount Native wei (18 decimals) for zero, else 18-decimal token units.
     function sweepToOwner(address token, uint256 amount) external;
 
@@ -255,7 +255,7 @@ interface IAgentAccount is IERC1271 {
     ///      token with a recorded basis, the recording is cut pro rata to `amount / balance` (tokens rounded up,
     ///      cost rounded down; the high-water stays unless the position closes), so tokens sent back later are
     ///      unrecorded.
-    /// @param token The token, or zero for native USDC.
+    /// @param token Token, or zero for native USDC.
     /// @param amount Native wei (18 decimals) for zero, else the token's own units.
     function withdraw(address token, uint256 amount) external;
     /// @notice Sends the full balance of each listed token, or of native USDC for zero, to the owner.

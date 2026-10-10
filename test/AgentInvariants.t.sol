@@ -56,7 +56,7 @@ contract AgentInvariantHandler {
 ///      charged, and every cap held at the time of the call. The owners' balances must equal the ghost tally of
 ///      withdrawals and sweeps (minus their deposits).
 contract AgentInvariantsTest is AgentFixture {
-    // ------------------------------------------------------------------ action kinds
+    // ---------------------------------------------------------------- action kinds
 
     uint256 internal constant BUY = 0;
     uint256 internal constant GRAD_BUY = 1;
@@ -166,7 +166,7 @@ contract AgentInvariantsTest is AgentFixture {
     uint256 public okCalls;
     uint256 public refusedCalls;
 
-    // ------------------------------------------------------------------ setup
+    // ---------------------------------------------------------------- setup
 
     function setUp() public override {
         super.setUp();
@@ -268,7 +268,7 @@ contract AgentInvariantsTest is AgentFixture {
         watchList.push(a);
     }
 
-    // ------------------------------------------------------------------ the step
+    // ---------------------------------------------------------------- the step
 
     function step(uint256 seed) external {
         require(msg.sender == address(handler), "handler only");
@@ -348,7 +348,7 @@ contract AgentInvariantsTest is AgentFixture {
         else _negCeiling(seed);
     }
 
-    // ------------------------------------------------------------------ small helpers
+    // ---------------------------------------------------------------- small helpers
 
     function _now() internal view returns (uint256) {
         return vm.getBlockTimestamp();
@@ -498,7 +498,7 @@ contract AgentInvariantsTest is AgentFixture {
         );
     }
 
-    // ------------------------------------------------------------------ conservation and isolation
+    // ---------------------------------------------------------------- conservation and isolation
 
     struct Pre {
         uint256 sysNative;
@@ -637,7 +637,7 @@ contract AgentInvariantsTest is AgentFixture {
         }
     }
 
-    // ------------------------------------------------------------------ ghosts: invariant 2
+    // ---------------------------------------------------------------- ghosts: invariant 2
 
     /// @dev Rolls the ghost period and raises the period's highest caps to the policy now in force.
     function _sync(uint256 i) internal {
@@ -679,7 +679,7 @@ contract AgentInvariantsTest is AgentFixture {
         assertEq(registry.tokenSpent(_acct(i), t), tokSpent, "registry token spend");
     }
 
-    // ------------------------------------------------------------------ agent calls (wrapped)
+    // ---------------------------------------------------------------- agent calls (wrapped)
 
     function _agentBuy(uint256 i, address agent, address t, uint256 amt) internal returns (uint256 out) {
         Pre memory s = _pre(i, t);
@@ -777,7 +777,7 @@ contract AgentInvariantsTest is AgentFixture {
         _afterSell(i, t, s, amountIn, out, value, cost0, tok0, hw0);
     }
 
-    // ------------------------------------------------------------------ positive actions
+    // ---------------------------------------------------------------- positive actions
 
     function _actBuy(uint256 seed) internal {
         uint256 i = seed % 2;
@@ -1180,7 +1180,7 @@ contract AgentInvariantsTest is AgentFixture {
         return address(0);
     }
 
-    // ------------------------------------------------------------------ owner actions
+    // ---------------------------------------------------------------- owner actions
 
     /// @dev Snapshot around an owner call: the other account must not move, and value stays in the system.
     function _ownerPre(uint256 i) internal view returns (Pre memory s) {
@@ -1589,7 +1589,7 @@ contract AgentInvariantsTest is AgentFixture {
         vm.roll(vm.getBlockNumber() + _b(_r(seed, 5), 0, 300));
     }
 
-    // ------------------------------------------------------------------ negative actions (expected reverts)
+    // ---------------------------------------------------------------- negative actions (expected reverts)
 
     function _snap() internal view returns (bytes32, bytes32) {
         return (_digest(0), _digest(1));
@@ -1759,7 +1759,7 @@ contract AgentInvariantsTest is AgentFixture {
         ++refusedCalls;
     }
 
-    // ------------------------------------------------------------------ over-cap refusals (spec 5.2)
+    // ---------------------------------------------------------------- over-cap refusals (spec 5.2)
     //
     // Each runs inside a snapshot: the owner narrows one cap so the headroom is exactly h, the agent asks for h + 1
     // (or a native cost of h * 1e12 + r wei), the call must revert with that cap's error carrying h, nothing may
@@ -1914,7 +1914,7 @@ contract AgentInvariantsTest is AgentFixture {
         ++refusedCalls;
     }
 
-    // ------------------------------------------------------------------ invariants
+    // ---------------------------------------------------------------- invariants
 
     /// @dev Spec 5.1: the owners received exactly what was withdrawn or swept to them (net of their deposits).
     function invariant_OwnersReceiveExactlyWithdrawalsAndSweeps() public view {

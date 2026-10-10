@@ -9,20 +9,20 @@ import {Policy, Agent, InitParams} from "../AgentTypes.sol";
 ///         account as its first indexed parameter. Funds, cost basis and trading stay in the account.
 interface IAgentPolicyRegistry {
     /// @notice A policy took effect, at creation or later.
-    /// @param account The agent account.
-    /// @param policy The full policy now in force (amounts usdc6).
+    /// @param account Agent account.
+    /// @param policy Full policy now in force (amounts usdc6).
     event PolicyApplied(address indexed account, Policy policy);
     /// @notice An agent key became able to act, or an active agent's terms changed (narrowed now or widened from the
     ///         queue). The event always carries the terms now in force.
-    /// @param account The agent account.
-    /// @param agent The agent key.
+    /// @param account Agent account.
+    /// @param agent Agent key.
     /// @param expiresAt Unix time (seconds) from which the agent can no longer act.
     /// @param permissions Bitmask of `P_*` permissions.
     event AgentActivated(address indexed account, address indexed agent, uint40 expiresAt, uint16 permissions);
     /// @notice An agent addition or widening was queued.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id, per account.
-    /// @param agent The agent key.
+    /// @param agent Agent key.
     /// @param expiresAt Requested expiry, Unix seconds.
     /// @param permissions Requested `P_*` bitmask.
     /// @param eta ETA at queue time, Unix seconds: queue time plus the delay then. A later delay raise moves it, so
@@ -36,66 +36,66 @@ interface IAgentPolicyRegistry {
         uint40 eta
     );
     /// @notice An address was retired forever, and revoked if it was an active agent.
-    /// @param account The agent account.
-    /// @param agent The address.
+    /// @param account Agent account.
+    /// @param agent Address.
     /// @param expiresAt Expiry it had, Unix seconds; zero if it was never an agent.
     /// @param permissions `P_*` bitmask it had; zero if it was never an agent.
     event AgentRevoked(address indexed account, address indexed agent, uint40 expiresAt, uint16 permissions);
     /// @notice A policy widening was queued.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id, per account.
     /// @param eta ETA at queue time, Unix seconds: queue time plus the delay then. A later delay raise moves it, so
     ///        read `queued(account, id)` for the effective ETA; the item expires 7 days after the effective ETA.
-    /// @param policy The full target policy (amounts usdc6); fields written after queueing keep their value.
+    /// @param policy Full target policy (amounts usdc6); fields written after queueing keep their value.
     event PolicyQueued(address indexed account, uint256 indexed id, uint40 eta, Policy policy);
     /// @notice A queued item was cancelled by the owner, or found void on an execution attempt after the account's
     ///         epoch moved (agents paused or ownership transferred).
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id, per account.
     event QueuedCancelled(address indexed account, uint256 indexed id);
     /// @notice A queued item was executed.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id, per account.
     event QueuedExecuted(address indexed account, uint256 indexed id);
     /// @notice A token was added to or removed from the buy allowlist.
-    /// @param account The agent account.
-    /// @param token The token.
+    /// @param account Agent account.
+    /// @param token Token.
     /// @param allowed Whether buys of it pass when `allowlistOnly` is set.
     event TokenAllowed(address indexed account, address indexed token, bool allowed);
     /// @notice Adding a token to the buy allowlist was queued.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id, per account.
-    /// @param token The token.
+    /// @param token Token.
     /// @param eta ETA at queue time, Unix seconds: queue time plus the delay then. A later delay raise moves it, so
     ///        read `queued(account, id)` for the effective ETA; the item expires 7 days after the effective ETA.
     event TokenAllowQueued(address indexed account, uint256 indexed id, address indexed token, uint40 eta);
     /// @notice The owner paused or unpaused the account's agents. Pausing voids every queued item.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param paused True when paused.
     event AgentsPaused(address indexed account, bool paused);
     /// @notice The widening delay changed.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param delay New delay, seconds.
     event IncreaseDelaySet(address indexed account, uint32 delay);
     /// @notice Lowering the widening delay was queued.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id, per account.
     /// @param delay Requested delay, seconds.
     /// @param eta ETA at queue time, Unix seconds: queue time plus the delay then. A later delay raise moves it, so
     ///        read `queued(account, id)` for the effective ETA; the item expires 7 days after the effective ETA.
     event IncreaseDelayQueued(address indexed account, uint256 indexed id, uint32 delay, uint40 eta);
     /// @notice An ownership transfer was queued; only `newOwner` can complete it, through `acceptOwnership`.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id, per account.
-    /// @param newOwner The proposed owner.
+    /// @param newOwner Proposed owner.
     /// @param eta ETA at queue time, Unix seconds: queue time plus the delay then. A later delay raise moves it, so
     ///        read `queued(account, id)` for the effective ETA from which `newOwner` may accept; it expires 7 days
     ///        after it.
     event OwnershipQueued(address indexed account, uint256 indexed id, address indexed newOwner, uint40 eta);
     /// @notice Ownership of the account moved. Every item queued before it is void.
-    /// @param account The agent account.
-    /// @param previousOwner The former owner.
-    /// @param newOwner The new owner.
+    /// @param account Agent account.
+    /// @param previousOwner Former owner.
+    /// @param newOwner New owner.
     event AccountOwnerChanged(address indexed account, address indexed previousOwner, address indexed newOwner);
 
     /// @notice Only the factory may register accounts.
@@ -173,13 +173,13 @@ interface IAgentPolicyRegistry {
     /// @param remaining Spend left on this token this period before the trade, usdc6.
     error TokenCapExceeded(uint256 remaining);
 
-    // ------------------------------------------------------------------ factory and account calls
+    // ---------------------------------------------------------------- factory and account calls
 
     /// @notice Registers a new account with its owner, policy, period, delay and optional first agent.
     /// @dev Factory only, once per account, inside `createAccount`. The policy and first agent take effect at once
     ///      but are checked against the factory's beta ceilings and the agent rules. `p.referrer` is not used here;
     ///      the account binds it.
-    /// @param account The new clone.
+    /// @param account New clone.
     /// @param owner_ Its owner, the caller of `createAccount`.
     /// @param p Creation parameters (policy amounts usdc6, times in seconds).
     function register(address account, address owner_, InitParams calldata p) external;
@@ -190,10 +190,10 @@ interface IAgentPolicyRegistry {
     ///      Every agent function counts one action here, including `claimFees` and `sweepToOwner`. For `P_LAUNCH` it
     ///      also reverts `LaunchLimit` when the period's launches are used up, after the action check and before the
     ///      account calls the LaunchFactory; `record` counts the launch.
-    /// @param agent The agent key that called the account.
-    /// @param permission The `P_*` bit the function needs.
-    /// @param deadline The agent's deadline, Unix seconds.
-    /// @return p The policy in force (amounts usdc6).
+    /// @param agent Agent key that called the account.
+    /// @param permission `P_*` bit the function needs.
+    /// @param deadline Agent's deadline, Unix seconds.
+    /// @return p Policy in force (amounts usdc6).
     /// @return periodId `block.timestamp / periodSeconds`.
     function authorize(address agent, uint16 permission, uint256 deadline)
         external
@@ -203,90 +203,90 @@ interface IAgentPolicyRegistry {
     /// @dev Callable only by a registered account, for itself. `spent6` counts toward `periodSpendCap` and the
     ///      per-token `perTokenPeriodCap` of `token`; `sellBasis6` toward `periodSellCap`; `isLaunch` toward
     ///      `launchesPerPeriod`. The account checks `maxTradeUsdc` itself.
-    /// @param token The token the spend is keyed by.
+    /// @param token Token the spend is keyed by.
     /// @param spent6 Measured USDC spent, usdc6.
     /// @param sellBasis6 Cost-basis value of a sell, usdc6.
     /// @param isLaunch True for a launch.
     function record(address token, uint256 spent6, uint256 sellBasis6, bool isLaunch) external;
 
-    // ------------------------------------------------------------------ views
+    // ---------------------------------------------------------------- views
 
     /// @notice The factory that alone registers accounts here and whose pause and ceilings apply.
-    /// @return The AgentAccountFactory address.
+    /// @return AgentAccountFactory address.
     function FACTORY() external view returns (address);
     /// @notice The account's owner, who manages it here and alone receives its withdrawals.
-    /// @param account The agent account.
-    /// @return The owner; zero for an address that is not a registered account.
+    /// @param account Agent account.
+    /// @return Owner; zero for an address that is not a registered account.
     function owner(address account) external view returns (address);
     /// @notice The policy in force.
-    /// @param account The agent account.
-    /// @return The policy (amounts usdc6).
+    /// @param account Agent account.
+    /// @return Policy (amounts usdc6).
     function policy(address account) external view returns (Policy memory);
     /// @notice Length of the account's usage period, fixed at creation.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @return Seconds.
     function periodSeconds(address account) external view returns (uint32);
     /// @notice Delay before a widening change takes effect.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @return Seconds.
     function increaseDelay(address account) external view returns (uint32);
     /// @notice An agent key's standing in an account.
-    /// @param account The agent account.
-    /// @param a The agent key.
-    /// @return The agent record; all zero if never added.
+    /// @param account Agent account.
+    /// @param a Agent key.
+    /// @return Agent record; all zero if never added.
     function agent(address account, address a) external view returns (Agent memory);
     /// @notice Number of active agents, expired ones included until revoked.
-    /// @param account The agent account.
-    /// @return The count, at most 8.
+    /// @param account Agent account.
+    /// @return Count, at most 8.
     function activeAgentCount(address account) external view returns (uint8);
     /// @notice Whether an address was revoked as an agent of the account; it can never be one again.
-    /// @param account The agent account.
-    /// @param a The address.
+    /// @param account Agent account.
+    /// @param a Address.
     /// @return True when retired.
     function retired(address account, address a) external view returns (bool);
     /// @notice Whether a token is on the account's buy allowlist, used when `allowlistOnly` is set.
-    /// @param account The agent account.
-    /// @param token The token.
+    /// @param account Agent account.
+    /// @param token Token.
     /// @return True when allowed.
     function tokenAllowed(address account, address token) external view returns (bool);
     /// @notice Whether the owner has paused the account's agents.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @return True when paused.
     function ownerPaused(address account) external view returns (bool);
     /// @notice Write sequence number: incremented by every applied change to the account's policy, an agent, a
     ///         token's allowlist entry or the delay. Queued items record it, and an item's subject written after
     ///         that number is not overwritten by it.
-    /// @param account The agent account.
-    /// @return The current number.
+    /// @param account Agent account.
+    /// @return Current number.
     function writeSeq(address account) external view returns (uint64);
     /// @notice Current queue epoch of the account. Items queued in an older epoch are void; pausing agents and
     ///         accepting ownership move it.
-    /// @param account The agent account.
-    /// @return The epoch.
+    /// @param account Agent account.
+    /// @return Epoch.
     function epoch(address account) external view returns (uint64);
     /// @notice Write sequence number of a policy field's last change.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param field Field index in `Policy` struct order (0–10).
-    /// @return The `writeSeq` value of that write; zero if never written (a field left at zero at creation).
+    /// @return `writeSeq` value of that write; zero if never written (a field left at zero at creation).
     function policyWrite(address account, uint256 field) external view returns (uint64);
     /// @notice Write sequence number of an agent address's last activation, term change or retirement.
-    /// @param account The agent account.
-    /// @param a The address.
-    /// @return The `writeSeq` value of that write; zero if never written.
+    /// @param account Agent account.
+    /// @param a Address.
+    /// @return `writeSeq` value of that write; zero if never written.
     function agentWrite(address account, address a) external view returns (uint64);
     /// @notice Write sequence number of a token's last allowlist addition or removal.
-    /// @param account The agent account.
-    /// @param token The token.
-    /// @return The `writeSeq` value of that write; zero if never written.
+    /// @param account Agent account.
+    /// @param token Token.
+    /// @return `writeSeq` value of that write; zero if never written.
     function tokenWrite(address account, address token) external view returns (uint64);
     /// @notice Write sequence number of the widening delay's last change.
-    /// @param account The agent account.
-    /// @return The `writeSeq` value of that write; zero if never changed after creation.
+    /// @param account Agent account.
+    /// @return `writeSeq` value of that write; zero if never changed after creation.
     function delayWrite(address account) external view returns (uint64);
     /// @notice A queued item of the account. An item is executable when it exists, its epoch equals
     ///         `epoch(account)` and `eta <= now <= eta + 7 days`. Expired and older-epoch items stay in storage until
     ///         executed (which deletes an older-epoch item) or cancelled.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id (ids start at 1 per account).
     /// @return kind `Q_*` kind; zero when no item has this id.
     /// @return eta Effective ETA, Unix seconds: queue time plus the larger of the delay at queue time and the
@@ -302,7 +302,7 @@ interface IAgentPolicyRegistry {
         view
         returns (uint8 kind, uint40 eta, uint64 itemEpoch, uint64 seq, bytes memory payload);
     /// @notice Usage of the account's current period; all zero (with the current id) once a new period has begun.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @return periodId `block.timestamp / periodSeconds`.
     /// @return spent USDC spent, usdc6.
     /// @return sold Sells at cost-basis value, usdc6.
@@ -313,13 +313,13 @@ interface IAgentPolicyRegistry {
         view
         returns (uint64 periodId, uint64 spent, uint64 sold, uint32 actions, uint16 launches);
     /// @notice USDC the account spent on `token` in the current period.
-    /// @param account The agent account.
-    /// @param token The token.
+    /// @param account Agent account.
+    /// @param token Token.
     /// @return usdc6.
     function tokenSpent(address account, address token) external view returns (uint64);
     /// @notice What is left of each period limit of the account right now (zero when a cap was lowered below its
     ///         usage).
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @return spend `periodSpendCap` left, usdc6.
     /// @return sell `periodSellCap` left, usdc6.
     /// @return actions Actions left.
@@ -329,13 +329,13 @@ interface IAgentPolicyRegistry {
         view
         returns (uint64 spend, uint64 sell, uint32 actions, uint16 launches);
 
-    // ------------------------------------------------------------------ owner functions
+    // ---------------------------------------------------------------- owner functions
 
     /// @notice Queues a new agent key; it becomes active once the item executes.
     /// @dev Account owner only. Reverts for a retired or active key, the owner, the account, zero, an expiry outside
     ///      `(now, now + 180 days]` or bad permissions; the terms and the 8-agent limit are checked again on execution.
-    /// @param account The agent account.
-    /// @param a The agent key.
+    /// @param account Agent account.
+    /// @param a Agent key.
     /// @param expiresAt Expiry, Unix seconds.
     /// @param permissions `P_*` bitmask, non-zero and within `P_ALL`.
     /// @return id Queue id.
@@ -343,8 +343,8 @@ interface IAgentPolicyRegistry {
     /// @notice Replaces an active agent's terms: immediately when the expiry is not later and no permission is added,
     ///         otherwise queued as a full replacement that executes only if the agent was not written since.
     /// @dev Account owner only. Reverts `AgentNotActive` for an inactive key.
-    /// @param account The agent account.
-    /// @param a The agent key.
+    /// @param account Agent account.
+    /// @param a Agent key.
     /// @param expiresAt New expiry, Unix seconds, in `(now, now + 180 days]`.
     /// @param permissions New `P_*` bitmask, non-zero and within `P_ALL`.
     /// @return id Queue id, or zero when applied immediately.
@@ -353,14 +353,14 @@ interface IAgentPolicyRegistry {
     ///         longer execute (an addition fails `AgentRetired`, a widening `StaleQueued`).
     /// @dev Account owner only. Reverts `InvalidAgent` for zero, the owner or the account, and `AgentRetired` if
     ///      already retired.
-    /// @param account The agent account.
-    /// @param a The address.
+    /// @param account Agent account.
+    /// @param a Address.
     function revokeAgent(address account, address a) external;
     /// @notice Retires `oldA` now (revoking it if active) and queues `newA` with the given terms.
     /// @dev Account owner only. Same checks as `revokeAgent` and `addAgent`.
-    /// @param account The agent account.
-    /// @param oldA The agent key to retire.
-    /// @param newA The replacement key.
+    /// @param account Agent account.
+    /// @param oldA Agent key to retire.
+    /// @param newA Replacement key.
     /// @param expiresAt Expiry of `newA`, Unix seconds.
     /// @param permissions `P_*` bitmask of `newA`.
     /// @return id Queue id of the addition.
@@ -372,34 +372,34 @@ interface IAgentPolicyRegistry {
     ///         current value.
     /// @dev Account owner only. Both the immediate result and the target are checked against the beta ceilings and
     ///      policy bounds; on execution the merged result is checked again.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param p Target policy (amounts usdc6).
     /// @return id Queue id, or zero when nothing was queued.
     function setPolicy(address account, Policy calldata p) external returns (uint256 id);
     /// @notice Removes a token from the buy allowlist now, or queues adding it.
     /// @dev Account owner only. Adding a token already allowed returns zero without queueing. A removal makes every
     ///      pending addition of the token stale.
-    /// @param account The agent account.
-    /// @param token The token; not zero.
+    /// @param account Agent account.
+    /// @param token Token; not zero.
     /// @param allowed True to add, false to remove.
     /// @return id Queue id, or zero when applied immediately.
     function setTokenAllowed(address account, address token, bool allowed) external returns (uint256 id);
     /// @notice Raises (or keeps) the widening delay now, or queues lowering it behind the current delay.
     /// @dev Account owner only. A queued lowering executes only if the delay was not written since.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param d New delay, seconds, at most 7 days.
     /// @return id Queue id, or zero when applied immediately.
     function setIncreaseDelay(address account, uint32 d) external returns (uint256 id);
     /// @notice Queues handing ownership to `newOwner`, who completes it with `acceptOwnership` after the delay.
     /// @dev Account owner only.
-    /// @param account The agent account.
-    /// @param newOwner The proposed owner: not zero, the account or the current owner.
+    /// @param account Agent account.
+    /// @param newOwner Proposed owner: not zero, the account or the current owner.
     /// @return id Queue id.
     function transferOwnership(address account, address newOwner) external returns (uint256 id);
     /// @notice Completes a queued ownership transfer. Moves the epoch, which voids every other queued item, and
     ///         revokes the new owner as an agent if it is one, so the owner never has a trade path.
     /// @dev Callable only by the queued new owner, from the ETA to 7 days after it, in the item's epoch.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id of the transfer.
     function acceptOwnership(address account, uint256 id) external;
     /// @notice Executes a queued item. Anyone may call it.
@@ -407,17 +407,17 @@ interface IAgentPolicyRegistry {
     ///      until cancelled. An item from an older epoch is deleted with `QueuedCancelled` instead, without
     ///      reverting. Ownership items revert `AcceptRequired`. A policy item whose every field was written after
     ///      queueing applies nothing and emits only `QueuedExecuted` (no `PolicyApplied`).
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id.
     function executeQueued(address account, uint256 id) external;
     /// @notice Deletes a queued item.
     /// @dev Account owner only.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param id Queue id.
     function cancelQueued(address account, uint256 id) external;
     /// @notice Pauses or unpauses the account's agents, immediately. Pausing voids every queued item.
     /// @dev Account owner only.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param paused True to pause.
     function pauseAgents(address account, bool paused) external;
 }

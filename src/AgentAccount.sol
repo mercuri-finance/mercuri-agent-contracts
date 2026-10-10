@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
 import {PoolKey} from "@uniswap/v4-core/src/types/PoolKey.sol";
 import {PoolId, PoolIdLibrary} from "@uniswap/v4-core/src/types/PoolId.sol";
@@ -15,11 +20,6 @@ import {BondingCurve} from "@mercuri/launch/BondingCurve.sol";
 import {LaunchFactory} from "@mercuri/launch/LaunchFactory.sol";
 import {GraduationManager} from "@mercuri/launch/GraduationManager.sol";
 import {CreateParams} from "@mercuri/launch/libraries/LaunchTypes.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import {IAgentAccount} from "./interfaces/IAgentAccount.sol";
 import {IAgentPolicyRegistry} from "./interfaces/IAgentPolicyRegistry.sol";
 import {AgentPolicyLib} from "./AgentPolicyLib.sol";
@@ -101,8 +101,8 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
     /// @notice Deploys the implementation, bound to its factory, the factory's registry and the network's Launch and
     ///         Uniswap contracts.
     /// @dev Reverts `ZeroAddress` for any zero dependency. Locks itself: `initialize` on the implementation reverts.
-    /// @param factory_ The AgentAccountFactory that will clone this implementation (predicted before deployment).
-    /// @param registry_ The AgentPolicyRegistry that factory deploys (predicted: the factory's first CREATE).
+    /// @param factory_ AgentAccountFactory that will clone this implementation (predicted before deployment).
+    /// @param registry_ AgentPolicyRegistry that factory deploys (predicted: the factory's first CREATE).
     /// @param launchFactory_ LaunchFactory proxy.
     /// @param feeManager_ FeeManager proxy.
     /// @param graduationManager_ GraduationManager proxy.
@@ -168,7 +168,7 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
         return (b.costUsdc, b.tokens, b.highWater);
     }
 
-    // ------------------------------------------------------------------ agent trading
+    // ---------------------------------------------------------------- agent trading
 
     /// @inheritdoc IAgentAccount
     function buy(address token, uint256 usdcIn, uint256 minTokensOut, uint256 deadline)
@@ -356,7 +356,7 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
         emit AgentAction(msg.sender, ACTION_SWEEP, token, 0, 0, -SafeCast.toInt256(amount), 0, periodId);
     }
 
-    // ------------------------------------------------------------------ withdrawals
+    // ---------------------------------------------------------------- withdrawals
 
     /// @inheritdoc IAgentAccount
     function withdraw(address token, uint256 amount) external nonReentrant {
@@ -385,11 +385,11 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
         return 0xffffffff;
     }
 
-    // ------------------------------------------------------------------ internals
+    // ---------------------------------------------------------------- internals
 
     /// @dev Adds a measured buy to `token`'s basis and raises its high-water average to the new average if higher.
     ///      Used by every path that records a purchase (curve buys, launch initial buys, pool buys).
-    /// @param token The token.
+    /// @param token Token.
     /// @param spent USDC spent, usdc6.
     /// @param tokensIn Tokens received, 18-decimal units; non-zero.
     function _addBasis(address token, uint256 spent, uint256 tokensIn) private {
@@ -406,7 +406,7 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
     ///      (rounded up) and the high-water value (rounded down: the stored high-water is already rounded up), so a
     ///      cheap buy after a crash cannot dilute earlier holdings and a whole single-lot position is charged exactly
     ///      its cost. Shared by curve and pool sells.
-    /// @param b The basis as loaded.
+    /// @param b Basis as loaded.
     /// @param recorded Recorded tokens sold, 18-decimal units.
     /// @return value usdc6.
     function _recordedValue(Basis memory b, uint256 recorded) private pure returns (uint256 value) {
@@ -418,12 +418,12 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
 
     /// @dev Swaps exactly `amountIn` of `input` for `output` in the pool `key` through the Universal Router, then
     ///      asserts both transient allowances are zero and the pool price moved at most `maxImpactBps`.
-    /// @param key The derived Launch pool key.
+    /// @param key Derived Launch pool key.
     /// @param input Input currency (USDC or the token).
     /// @param output Output currency.
     /// @param amountIn Exact input, in `input`'s ERC-20 units; at most `type(uint128).max`.
     /// @param minOut Minimum output, in `output`'s ERC-20 units; at most `type(uint128).max`.
-    /// @param deadline The router's deadline, Unix seconds.
+    /// @param deadline Router's deadline, Unix seconds.
     /// @param maxImpactBps `maxPriceImpactBps`.
     function _poolSwap(
         PoolKey memory key,
@@ -465,8 +465,8 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
 
     /// @dev Removes `cut` recorded tokens (at most `b.tokens`) and their pro-rata cost, rounded down so the
     ///      remaining average never falls. Closing the position clears cost and high-water.
-    /// @param token The token.
-    /// @param b The basis as loaded (memory copy).
+    /// @param token Token.
+    /// @param b Basis as loaded (memory copy).
     /// @param cut Recorded tokens to remove, 18-decimal units.
     function _cutBasis(address token, Basis memory b, uint256 cut) private {
         if (cut >= b.tokens) {
@@ -479,7 +479,7 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
     }
 
     /// @dev Reverts `NotOwner` unless the caller is the account's owner in the registry.
-    /// @return The owner.
+    /// @return Owner.
     function _checkOwner() private view returns (address) {
         address o = owner();
         if (msg.sender != o) revert NotOwner();
@@ -487,8 +487,8 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
     }
 
     /// @dev The registered curve of `token`; reverts `TokenNotRegistered` when the Launch factory has none.
-    /// @param token The token.
-    /// @return The curve.
+    /// @param token Token.
+    /// @return Curve.
     function _curve(address token) private view returns (BondingCurve) {
         address c = LAUNCH_FACTORY.curveOf(token);
         if (c == address(0)) revert TokenNotRegistered();
@@ -504,15 +504,15 @@ contract AgentAccount is IAgentAccount, ReentrancyGuardTransient {
     }
 
     /// @dev Reverts `PriceImpactTooHigh(bps)` when `bps > max`.
-    /// @param bps The trade's impact, basis points.
+    /// @param bps Trade's impact, basis points.
     /// @param max `maxPriceImpactBps`.
     function _checkImpact(uint256 bps, uint256 max) private pure {
         if (bps > max) revert PriceImpactTooHigh(bps);
     }
 
     /// @dev Sends `amount` of `token` (zero: native wei) to `to`, the owner, and emits `AccountWithdrawn`.
-    /// @param to The owner.
-    /// @param token The token, or zero for native USDC.
+    /// @param to Owner.
+    /// @param token Token, or zero for native USDC.
     /// @param amount Native wei (18 decimals) for zero, else the token's own units.
     function _send(address to, address token, uint256 amount) private {
         if (token == address(0)) {

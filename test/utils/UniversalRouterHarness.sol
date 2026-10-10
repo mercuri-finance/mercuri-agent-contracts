@@ -20,8 +20,9 @@ interface ICanonicalRouter {
     function execute(bytes calldata commands, bytes[] calldata inputs, uint256 deadline) external payable;
 }
 
-/// @dev The pinned upstream Universal Router (built by `script/build-universal-router.sh`), a V4Quoter and Launch/listed
-///      markets on top of the Launch fixture. Extracted unchanged from the order tests this suite was developed beside.
+/// @dev The pinned upstream Universal Router (built by `script/build-universal-router.sh`), a V4Quoter and
+///      Launch/listed markets on top of the Launch fixture. Extracted unchanged from the order tests this suite was
+///      developed beside.
 abstract contract UniversalRouterHarness is LaunchFixture {
     ICanonicalRouter internal router;
     IV4Quoter internal quoter;

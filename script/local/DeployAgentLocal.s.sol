@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
+import {Script} from "forge-std/Script.sol";
 import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
 import {PoolManager} from "@uniswap/v4-core/src/PoolManager.sol";
 import {Hooks} from "@uniswap/v4-core/src/libraries/Hooks.sol";
 import {V4Quoter} from "@uniswap/v4-periphery/src/lens/V4Quoter.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {Script} from "forge-std/Script.sol";
 import {DeployPermit2} from "permit2/test/utils/DeployPermit2.sol";
 import {LaunchConfig} from "@mercuri/launch/libraries/LaunchTypes.sol";
 import {LaunchFactory} from "@mercuri/launch/LaunchFactory.sol";

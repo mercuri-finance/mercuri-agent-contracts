@@ -7,17 +7,17 @@ import {Policy, InitParams} from "../AgentTypes.sol";
 ///         ceilings and the guardian pause of agent functions. Immutable; holds no funds.
 interface IAgentAccountFactory {
     /// @notice An account was created and initialised.
-    /// @param owner The account's owner, the caller of `createAccount`.
-    /// @param account The new account.
-    /// @param referrer The referrer bound for the account, or zero.
-    /// @param salt The caller's salt, before it is mixed with the owner.
+    /// @param owner Account's owner, the caller of `createAccount`.
+    /// @param account New account.
+    /// @param referrer Referrer bound for the account, or zero.
+    /// @param salt Caller's salt, before it is mixed with the owner.
     event AccountCreated(address indexed owner, address indexed account, address indexed referrer, bytes32 salt);
     /// @notice Agent functions of every account are paused until `until`.
     /// @param until Unix time (seconds) the pause ends; zero or a past time means not paused.
-    /// @param by The guardian or admin that set it.
+    /// @param by Guardian or admin that set it.
     event AgentsPausedUntil(uint40 until, address by);
     /// @notice The guardian changed.
-    /// @param guardian The new guardian.
+    /// @param guardian New guardian.
     event GuardianSet(address guardian);
 
     /// @notice The implementation, the admin or a new guardian is the zero address.
@@ -33,7 +33,7 @@ interface IAgentAccountFactory {
     /// @param maxUntil Latest end the admin may set now, Unix seconds.
     error PauseTooLong(uint40 maxUntil);
     /// @notice The caller already created an account with this salt.
-    /// @param account The existing account.
+    /// @param account Existing account.
     error AccountExists(address account);
     /// @notice The caller is not the admin.
     error NotAdmin();
@@ -51,26 +51,26 @@ interface IAgentAccountFactory {
     ///      address. Reverts `AccountExists` if that address is already used.
     /// @param salt Caller-chosen salt.
     /// @param p Creation parameters (policy amounts usdc6, times in seconds).
-    /// @return account The new account.
+    /// @return account New account.
     function createAccount(bytes32 salt, InitParams calldata p) external returns (address account);
     /// @notice Address `createAccount(salt, …)` called by `owner` deploys to.
-    /// @param owner The future owner.
-    /// @param salt The salt the owner will pass.
-    /// @return The predicted account address.
+    /// @param owner Future owner.
+    /// @param salt Salt the owner will pass.
+    /// @return Predicted account address.
     function predictAccount(address owner, bytes32 salt) external view returns (address);
     /// @notice Whether an address is an account created by this factory.
     /// @param account Address to check.
     /// @return True for accounts created here.
     function isAccount(address account) external view returns (bool);
     /// @notice The account implementation every clone delegates to.
-    /// @return The implementation address.
+    /// @return Implementation address.
     function implementation() external view returns (address);
     /// @notice The registry of every account's owner, policy, agents, queue and usage, deployed by this factory.
-    /// @return The AgentPolicyRegistry address.
+    /// @return AgentPolicyRegistry address.
     function registry() external view returns (address);
     /// @notice The beta ceilings every stored policy must stay within.
     /// @dev Same shape as `Policy` (amounts usdc6). `allowlistOnly` is ignored; `minTokenAgeBlocks` is a floor.
-    /// @return The ceilings.
+    /// @return Ceilings.
     function ceilings() external view returns (Policy memory);
     /// @notice Whether agent functions of every account are paused.
     /// @return True while `block.timestamp < pausedUntil`.
@@ -79,13 +79,13 @@ interface IAgentAccountFactory {
     /// @return Unix time (seconds); zero or a past time means not paused.
     function pausedUntil() external view returns (uint40);
     /// @notice Address that may pause agent functions for 72 hours.
-    /// @return The guardian, or zero if none.
+    /// @return Guardian, or zero if none.
     function guardian() external view returns (address);
     /// @notice Address that may replace the guardian and extend or lift a pause: the network's Launch timelock.
-    /// @return The admin.
+    /// @return Admin.
     function admin() external view returns (address);
     /// @notice The factory's version.
-    /// @return The version string.
+    /// @return Version string.
     function VERSION() external view returns (string memory);
     /// @notice Pauses agent functions of every account for at least 72 hours.
     /// @dev Guardian only. Sets `pausedUntil` to `max(pausedUntil, now + 72 hours)`, so it never shortens a pause the
@@ -104,6 +104,6 @@ interface IAgentAccountFactory {
     /// @notice Replaces the guardian.
     /// @dev Admin only. Reverts `ZeroAddress` for zero, and `GuardianDisabled` forever on a factory deployed without
     ///      a guardian.
-    /// @param g The new guardian.
+    /// @param g New guardian.
     function setGuardian(address g) external;
 }

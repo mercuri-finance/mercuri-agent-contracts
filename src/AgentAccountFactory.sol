@@ -13,9 +13,9 @@ import {Policy, InitParams, GUARDIAN_PAUSE, GUARDIAN_COOLDOWN, MAX_ADMIN_PAUSE} 
 ///         policy ceilings and the guardian pause of agent functions.
 /// @dev Immutable, holds no funds. The admin (the network's Launch timelock) can only replace the guardian, shorten or
 ///      lift a pause, and extend an active pause to at most 30 days from now; it cannot start a pause or touch
-///      accounts, policies or funds. The 30 days run from each extension, so the admin can keep an active pause
-///      going indefinitely by extending it again before it ends (a rolling extension). A factory deployed with guardian zero can never pause: `guardianPause`,
-///      `setGuardian` and `adminSetPausedUntil` revert forever.
+///      accounts, policies or funds. The 30 days run from each extension, so the admin can keep an active pause going
+///      indefinitely by extending it again before it ends (a rolling extension). A factory deployed with guardian zero
+///      can never pause: `guardianPause`, `setGuardian` and `adminSetPausedUntil` revert forever.
 contract AgentAccountFactory is IAgentAccountFactory {
     /// @notice The factory's version.
     string public constant VERSION = "1.0.0-beta.1";
@@ -59,8 +59,8 @@ contract AgentAccountFactory is IAgentAccountFactory {
     ///      the pause forever.
     /// @param implementation_ AgentAccount implementation whose `FACTORY` is this factory and whose `REGISTRY` is the
     ///        registry this constructor deploys.
-    /// @param admin_ The network's Launch timelock.
-    /// @param guardian_ The Guardian Safe, or zero for no pause at all.
+    /// @param admin_ Network's Launch timelock.
+    /// @param guardian_ Guardian Safe, or zero for no pause at all.
     /// @param ceilings_ Beta ceilings (amounts usdc6); `allowlistOnly` is ignored, `minTokenAgeBlocks` is a floor.
     constructor(address implementation_, address admin_, address guardian_, Policy memory ceilings_) {
         if (implementation_ == address(0) || admin_ == address(0)) revert ZeroAddress();
@@ -174,9 +174,9 @@ contract AgentAccountFactory is IAgentAccountFactory {
     }
 
     /// @dev CREATE2 salt of `owner`'s account for `salt`.
-    /// @param owner The account's owner.
-    /// @param salt The owner's salt.
-    /// @return The salt passed to CREATE2.
+    /// @param owner Account's owner.
+    /// @param salt Owner's salt.
+    /// @return Salt passed to CREATE2.
     function _salt(address owner, bytes32 salt) private pure returns (bytes32) {
         return keccak256(abi.encode(owner, salt));
     }

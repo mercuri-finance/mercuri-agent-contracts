@@ -96,7 +96,7 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
         FACTORY = msg.sender;
     }
 
-    // ------------------------------------------------------------------ factory and account calls
+    // ---------------------------------------------------------------- factory and account calls
 
     /// @inheritdoc IAgentPolicyRegistry
     function register(address account, address owner_, InitParams calldata p) external {
@@ -124,10 +124,10 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
     ///      Every agent function counts one action here, including `claimFees` and `sweepToOwner`. For `P_LAUNCH` it
     ///      also reverts `LaunchLimit` when the period's launches are used up, after the action check and before the
     ///      account calls the LaunchFactory; `record` counts the launch.
-    /// @param agent_ The agent key that called the account.
-    /// @param permission The `P_*` bit the function needs.
-    /// @param deadline The agent's deadline, Unix seconds.
-    /// @return p The policy in force (amounts usdc6).
+    /// @param agent_ Agent key that called the account.
+    /// @param permission `P_*` bit the function needs.
+    /// @param deadline Agent's deadline, Unix seconds.
+    /// @return p Policy in force (amounts usdc6).
     /// @return periodId `block.timestamp / periodSeconds`.
     function authorize(address agent_, uint16 permission, uint256 deadline)
         external
@@ -183,7 +183,7 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
         c.usage = u;
     }
 
-    // ------------------------------------------------------------------ views
+    // ---------------------------------------------------------------- views
 
     /// @inheritdoc IAgentPolicyRegistry
     function owner(address account) external view returns (address) {
@@ -280,7 +280,7 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
         );
     }
 
-    // ------------------------------------------------------------------ agents
+    // ---------------------------------------------------------------- agents
 
     /// @inheritdoc IAgentPolicyRegistry
     function addAgent(address account, address a, uint40 expiresAt, uint16 permissions)
@@ -325,7 +325,7 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
         return addAgent(account, newA, expiresAt, permissions);
     }
 
-    // ------------------------------------------------------------------ policy, allowlist and delay
+    // ---------------------------------------------------------------- policy, allowlist and delay
 
     /// @inheritdoc IAgentPolicyRegistry
     function setPolicy(address account, Policy calldata p) external onlyOwner(account) returns (uint256 id) {
@@ -370,7 +370,7 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
         emit IncreaseDelayQueued(account, id, d, _queueEta(account));
     }
 
-    // ------------------------------------------------------------------ ownership
+    // ---------------------------------------------------------------- ownership
 
     /// @inheritdoc IAgentPolicyRegistry
     function transferOwnership(address account, address newOwner) external onlyOwner(account) returns (uint256 id) {
@@ -396,7 +396,7 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
         emit AccountOwnerChanged(account, previous, msg.sender);
     }
 
-    // ------------------------------------------------------------------ queue
+    // ---------------------------------------------------------------- queue
 
     /// @inheritdoc IAgentPolicyRegistry
     function executeQueued(address account, uint256 id) external {
@@ -460,17 +460,17 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
         emit AgentsPaused(account, paused);
     }
 
-    // ------------------------------------------------------------------ internals
+    // ---------------------------------------------------------------- internals
 
     /// @dev The caller's configuration; reverts `NotAccount` unless the caller is a registered account.
-    /// @return c The caller's configuration.
+    /// @return c Caller's configuration.
     function _account() private view returns (Config storage c) {
         c = _c[msg.sender];
         if (c.owner == address(0)) revert NotAccount();
     }
 
     /// @dev Stored usage, or a zero usage of the current period once the period has changed.
-    /// @param c The account's configuration.
+    /// @param c Account's configuration.
     /// @return u Usage of the current period (amounts usdc6).
     function _currentUsage(Config storage c) private view returns (Usage memory u) {
         u = c.usage;
@@ -480,8 +480,8 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
     }
 
     /// @dev `cap - used`, or zero when the cap was lowered below the usage.
-    /// @param cap The limit.
-    /// @param used The usage.
+    /// @param cap Limit.
+    /// @param used Usage.
     /// @return What is left.
     function _left(uint256 cap, uint256 used) private pure returns (uint256) {
         return cap > used ? cap - used : 0;
@@ -489,7 +489,7 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
 
     /// @dev Checks `next` against `validate` and the factory's beta ceilings, stores it, records each changed field's
     ///      write and emits `PolicyApplied`. Every policy write goes through here.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param next Policy to apply (amounts usdc6).
     function _applyPolicy(address account, Policy memory next) private {
         next.checkCeilings(IAgentAccountFactory(FACTORY).ceilings());
@@ -506,16 +506,16 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
     }
 
     /// @dev Reverts `NotOwner` unless the caller is the owner of `account` (never true for an unregistered one).
-    /// @param account The agent account.
+    /// @param account Agent account.
     function _checkOwner(address account) private view {
         if (msg.sender != _c[account].owner) revert NotOwner();
     }
 
     /// @dev Stores a new queued item with the current time, delay, epoch and write sequence number.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param kind `Q_*` kind.
     /// @param payload ABI-encoded arguments.
-    /// @return id The new queue id, per account.
+    /// @return id New queue id, per account.
     function _queueItem(address account, uint8 kind, bytes memory payload) private returns (uint256 id) {
         Config storage c = _c[account];
         id = ++c.lastQueueId;
@@ -530,7 +530,7 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
     }
 
     /// @dev ETA of an item queued now: `now + increaseDelay`.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @return Unix seconds.
     function _queueEta(address account) private view returns (uint40) {
         return uint40(block.timestamp + _c[account].increaseDelay);
@@ -538,9 +538,9 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
 
     /// @dev Effective ETA: `queuedAt + max(delayAtQueue, increaseDelay)`, so raising the delay also delays items
     ///      already queued.
-    /// @param c The account's configuration.
-    /// @param queuedAt The item's queue time, Unix seconds.
-    /// @param delayAtQueue The delay when it was queued, seconds.
+    /// @param c Account's configuration.
+    /// @param queuedAt Item's queue time, Unix seconds.
+    /// @param delayAtQueue Delay when it was queued, seconds.
     /// @return Unix seconds.
     function _eta(Config storage c, uint40 queuedAt, uint32 delayAtQueue) private view returns (uint40) {
         uint32 d = c.increaseDelay;
@@ -548,21 +548,21 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
     }
 
     /// @dev Reverts `TooEarly` before `eta` and `QueuedExpired` after `eta + QUEUE_TTL`.
-    /// @param eta The item's effective ETA, Unix seconds.
+    /// @param eta Item's effective ETA, Unix seconds.
     function _checkWindow(uint40 eta) private view {
         if (block.timestamp < eta) revert TooEarly(eta);
         if (block.timestamp > eta + QUEUE_TTL) revert QueuedExpired();
     }
 
     /// @dev Reverts `StaleQueued` when the item's subject was written after the item was queued.
-    /// @param lastWrite The subject's last write sequence number.
-    /// @param seq The item's `writeSeq` at queue time.
+    /// @param lastWrite Subject's last write sequence number.
+    /// @param seq Item's `writeSeq` at queue time.
     function _checkFresh(uint64 lastWrite, uint64 seq) private pure {
         if (lastWrite > seq) revert StaleQueued();
     }
 
     /// @dev Stores the widening delay, records the write and emits `IncreaseDelaySet`.
-    /// @param account The agent account.
+    /// @param account Agent account.
     /// @param d Delay, seconds.
     function _setDelay(address account, uint32 d) private {
         Config storage c = _c[account];
@@ -572,8 +572,8 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
     }
 
     /// @dev Reverts unless `a` can be added now: not retired, not active, and acceptable terms.
-    /// @param account The agent account.
-    /// @param a The agent key.
+    /// @param account Agent account.
+    /// @param a Agent key.
     /// @param expiresAt Expiry, Unix seconds.
     /// @param permissions `P_*` bitmask.
     function _checkAddable(address account, address a, uint40 expiresAt, uint16 permissions) private view {
@@ -583,8 +583,8 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
     }
 
     /// @dev Marks `a` active with these terms and emits `AgentActivated`. Callers check the terms.
-    /// @param account The agent account.
-    /// @param a The agent key.
+    /// @param account Agent account.
+    /// @param a Agent key.
     /// @param expiresAt Expiry, Unix seconds.
     /// @param permissions `P_*` bitmask.
     function _setAgentTerms(address account, address a, uint40 expiresAt, uint16 permissions) private {
@@ -595,8 +595,8 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
 
     /// @dev Retires `a` forever, revoking it if active, and records the write. Reverts `InvalidAgent` for zero, the
     ///      owner or the account, which can never be agents.
-    /// @param account The agent account.
-    /// @param a The address.
+    /// @param account Agent account.
+    /// @param a Address.
     function _revoke(address account, address a) private {
         Config storage c = _c[account];
         if (a == address(0) || a == c.owner || a == account) revert InvalidAgent();
@@ -614,8 +614,8 @@ contract AgentPolicyRegistry is IAgentPolicyRegistry {
     /// @dev Reverts unless `a` may become an agent of `account` with these terms: not zero, the owner or the
     ///      account; expiry in `(now, now + 180 days]`; permissions non-zero and within `P_ALL`. An owner-agent would
     ///      give the owner a trade path.
-    /// @param account The agent account.
-    /// @param a The agent key.
+    /// @param account Agent account.
+    /// @param a Agent key.
     /// @param expiresAt Expiry, Unix seconds.
     /// @param permissions `P_*` bitmask.
     function _checkAgentTerms(address account, address a, uint40 expiresAt, uint16 permissions) private view {
